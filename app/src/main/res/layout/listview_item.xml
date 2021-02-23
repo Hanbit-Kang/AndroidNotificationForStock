@@ -11,6 +11,7 @@
     android:paddingLeft="24dp"
     android:paddingRight="24dp"
     android:id="@+id/listview_item"
+    android:descendantFocusability="blocksDescendants"
     >
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
