@@ -2,11 +2,14 @@ package com.example.youshouldcheckthis
 
  import android.content.Context
  import android.graphics.Color
+ import android.util.Log
  import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.TextView
+ import android.widget.CheckBox
+ import android.widget.LinearLayout
+ import android.widget.TextView
  import androidx.core.content.ContextCompat
 
 class ListViewAdapter : BaseAdapter(){
@@ -31,6 +34,7 @@ class ListViewAdapter : BaseAdapter(){
 
         val listViewItem = listViewItemList[position]
 
+        //각 값들 대입, 형식 변환, 색상 결정
         val stocksetting: StockSetting = StockSetting()
         stockNameTextView.text = listViewItem.stockNameStr
         stockPriceTextView.text = stocksetting.convertStockPrice(listViewItem.stockPriceStr)
@@ -41,6 +45,28 @@ class ListViewAdapter : BaseAdapter(){
             stockRateTextView.setTextColor(Color.parseColor("#0000FF"))
         }
 
+        //LongClick -> edit mode
+        val listviewItem = view.findViewById<LinearLayout>(R.id.listview_item)
+        listviewItem.setOnLongClickListener(View.OnLongClickListener{
+            var i:Int= 0
+            for(i in 0 until this.count){
+                val curView:View = parent.getChildAt(i)
+                val checkboxLayout = curView.findViewById<LinearLayout>(R.id.checkbox_layout)
+                checkboxLayout.visibility = View.VISIBLE
+            }
+            val checkbox = view.findViewById<CheckBox>(R.id.checkbox)
+            checkbox.isChecked = true
+            true
+        })
+
+        //Item click(not only checkbox) -> checked
+        listviewItem.setOnClickListener(View.OnClickListener{
+            val checkbox = view.findViewById<CheckBox>(R.id.checkbox)
+            if(checkbox.visibility==View.VISIBLE){
+                checkbox.isChecked = checkbox.isChecked==false
+            }
+            true
+        })
         return view
     }
 
@@ -48,7 +74,7 @@ class ListViewAdapter : BaseAdapter(){
         return position.toLong()
     }
 
-    override fun getItem(position: Int): Any {
+    override fun getItem(position: Int): ListViewItem {
         return listViewItemList[position]
     }
 
