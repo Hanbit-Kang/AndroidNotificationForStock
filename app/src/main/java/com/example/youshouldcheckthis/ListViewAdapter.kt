@@ -5,6 +5,7 @@ package com.example.youshouldcheckthis
  import android.graphics.Color
  import android.os.Handler
  import android.os.Looper
+ import android.os.Message
  import android.text.Layout
  import android.util.Log
  import android.util.TypedValue
@@ -13,12 +14,11 @@ package com.example.youshouldcheckthis
  import android.view.animation.RotateAnimation
  import android.view.animation.TranslateAnimation
  import android.view.inputmethod.InputMethodManager
- import android.widget.BaseAdapter
- import android.widget.CheckBox
- import android.widget.LinearLayout
- import android.widget.TextView
+ import android.widget.*
  import androidx.core.content.ContextCompat
  import com.google.android.material.floatingactionbutton.FloatingActionButton
+ import org.jsoup.Jsoup
+
 
 class ListViewAdapter : BaseAdapter(){
     private var listViewItemList = ArrayList<ListViewItem>()
@@ -48,14 +48,16 @@ class ListViewAdapter : BaseAdapter(){
 
         //각 값들 대입, 형식 변환, 색상 결정
         val stocksetting: StockSetting = StockSetting()
+
         stockNameTextView.text = listViewItem.stockNameStr
-        stockPriceTextView.text = stocksetting.convertStockPrice(listViewItem.stockPriceStr)
-        stockRateTextView.text = stocksetting.convertStockRate(listViewItem.stockRateStr)
+        stockPriceTextView.text = listViewItem.stockPriceStr
+        stockRateTextView.text = listViewItem.stockRateStr
+/*
         if(listViewItem.stockRateStr?.toDouble()!!>=0){
             stockRateTextView.setTextColor(Color.parseColor("#FF0000"))
         }else{
             stockRateTextView.setTextColor(Color.parseColor("#0000FF"))
-        }
+        }*/
 
         //LongClick -> edit mode
         val listviewItem = view.findViewById<LinearLayout>(R.id.listview_item)
@@ -86,16 +88,34 @@ class ListViewAdapter : BaseAdapter(){
         return listViewItemList[position]
     }
 
-    fun addItem(stockName: String, stockPrice: String, stockRate: String){
+    fun addItem(stockName: String){
         val item = ListViewItem()
-
         item.stockNameStr = stockName
-        item.stockPriceStr = stockPrice
-        item.stockRateStr = stockRate
-
+        item.stockPriceStr = "0"
+        item.stockRateStr = "0"
         listViewItemList.add(item)
+        this.refreshStock(listViewItemList.size-1)
     }
-
+    fun refreshStock(index: Int){
+        val rThread = Thread(
+                Runnable {
+                    try {
+                        val url = "https://www.google.com/search?q=" + listViewItemList[index].stockNameStr + "&tbm=fin"
+                        val doc = Jsoup.connect(url).timeout(1000 * 10).get()
+                        val priceData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > span:nth-child(1) > span > span:nth-child(1)")
+                        val rateData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > span:nth-child(2) > span:nth-child(2) > span:nth-child(1)")
+                        Log.e("MainActivity", priceData.size.toString())
+                        // TODO: 2021-02-24 쓰레드 안은 동기식인데 왜 select가 끝나지 않았는데 .. 머 암튼 검색이 되다가 안 되다라 반반
+                        listViewItemList[index].stockPriceStr = priceData.text().toString()
+                        listViewItemList[index].stockRateStr = rateData.text().toString()
+                        this.notifyDataSetChanged()
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                    }
+                }
+        )
+        rThread.start()
+    }
     fun removeItem(index:Int){
         listViewItemList.removeAt(index)
     }

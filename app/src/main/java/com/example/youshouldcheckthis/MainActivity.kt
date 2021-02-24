@@ -34,10 +34,10 @@ class MainActivity : AppCompatActivity() {
         listview.adapter = adapter
 
         //Default
-        adapter.addItem("NAVER", "399420", "0.52")
-        adapter.addItem("LG디스플레이", "24350", "-0.34")
-        adapter.addItem("SK하이닉스", "136500", "2.63")
-        adapter.addItem("삼성전자", "82200", "-0.48")
+        adapter.addItem("NAVER")
+        adapter.addItem("LG디스플레이")
+        adapter.addItem("SK하이닉스")
+        adapter.addItem("삼성전자")
 
         // + / x Btn
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity() {
                             imm.hideSoftInputFromWindow(dialogText.windowToken, 0)
                         }
                         .setPositiveButton("확인"){ dialog: DialogInterface?, which: Int ->
-                            adapter.addItem(dialogText.text.toString(), "0", "0")
+                            adapter.addItem(dialogText.text.toString())
                             imm.hideSoftInputFromWindow(dialogText.windowToken, 0)
                         }
                         .setCancelable(false)
