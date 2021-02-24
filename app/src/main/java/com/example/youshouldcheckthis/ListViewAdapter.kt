@@ -3,14 +3,16 @@ package com.example.youshouldcheckthis
  import android.animation.ValueAnimator
  import android.content.Context
  import android.graphics.Color
+ import android.os.Handler
+ import android.os.Looper
  import android.text.Layout
  import android.util.Log
- import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
- import android.view.ViewParent
+ import android.util.TypedValue
+ import android.view.*
  import android.view.animation.Animation
  import android.view.animation.RotateAnimation
+ import android.view.animation.TranslateAnimation
+ import android.view.inputmethod.InputMethodManager
  import android.widget.BaseAdapter
  import android.widget.CheckBox
  import android.widget.LinearLayout
@@ -108,6 +110,15 @@ class ListViewAdapter : BaseAdapter(){
 
         var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
         fabRemove.visibility = View.VISIBLE
+        val animationTranslateUp:TranslateAnimation = TranslateAnimation(
+                0f,
+                0f,
+                dpToPx(viewGroupParent.context, 64f).toFloat(),
+                0f
+        )
+        animationTranslateUp.duration = 200
+        animationTranslateUp.fillAfter = true
+        fabRemove.startAnimation(animationTranslateUp)
 
         var fabAdd = this.rootView.findViewById<FloatingActionButton>(R.id.fab_add)
         val animationRotate45Degree: RotateAnimation = RotateAnimation(
@@ -116,7 +127,7 @@ class ListViewAdapter : BaseAdapter(){
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f
         )
-        animationRotate45Degree.duration = 250
+        animationRotate45Degree.duration = 200
         animationRotate45Degree.fillAfter = true
         fabAdd.startAnimation(animationRotate45Degree)
     }
@@ -130,8 +141,21 @@ class ListViewAdapter : BaseAdapter(){
             checkboxLayout.visibility = View.INVISIBLE
             checkbox.isChecked = false
         }
+
         var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
-        fabRemove.visibility = View.INVISIBLE
+        val animationTranslateDown:TranslateAnimation = TranslateAnimation(
+                0f,
+                0f,
+                0f,
+                dpToPx(viewGroupParent.context, 64f).toFloat()
+        )
+        animationTranslateDown.duration = 200
+        animationTranslateDown.fillAfter = true
+        fabRemove.startAnimation(animationTranslateDown)
+        Handler(Looper.getMainLooper()).postDelayed({
+            fabRemove.visibility = View.INVISIBLE
+        }, 250L)
+
         var fabAdd = this.rootView.findViewById<FloatingActionButton>(R.id.fab_add)
         val animationRotate45Degree: RotateAnimation = RotateAnimation(
                 45f,
@@ -139,8 +163,12 @@ class ListViewAdapter : BaseAdapter(){
                 Animation.RELATIVE_TO_SELF, 0.5f,
                 Animation.RELATIVE_TO_SELF, 0.5f
         )
-        animationRotate45Degree.duration = 250
+        animationRotate45Degree.duration = 200
         animationRotate45Degree.fillAfter = true
         fabAdd.startAnimation(animationRotate45Degree)
+    }
+
+    fun dpToPx(context: Context, dp: Float): Float {
+        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.resources.displayMetrics)
     }
 }
