@@ -2,6 +2,7 @@ package com.example.youshouldcheckthis
 
  import android.animation.ValueAnimator
  import android.content.Context
+ import android.content.Intent
  import android.graphics.Color
  import android.os.Handler
  import android.os.Looper
@@ -18,49 +19,48 @@ package com.example.youshouldcheckthis
  import androidx.core.content.ContextCompat
  import com.google.android.material.floatingactionbutton.FloatingActionButton
  import org.jsoup.Jsoup
-
+import kotlin.coroutines.*
 
 class ListViewAdapter : BaseAdapter(){
     private var listViewItemList = ArrayList<ListViewItem>()
     public var isRemoveMode = false
     private lateinit var viewGroupParent:ViewGroup
     public lateinit var rootView:View
+    public lateinit var interfaceMainActivity:InterfaceMainActivity
 
     override fun getCount(): Int{
         return listViewItemList.size
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
+        Log.e("MainActivity", "VIEW"+position.toString())
         var view = convertView
         val context = parent.context
         this.viewGroupParent = parent
-
         if (view==null){
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.listview_item, parent, false)
         }
-
+        //list를 View에 대입
         val stockNameTextView = view!!.findViewById<TextView>(R.id.text_stock_name)
         val stockPriceTextView = view.findViewById<TextView>(R.id.text_stock_price)
         val stockRateTextView = view.findViewById<TextView>(R.id.text_stock_rate)
+        val curlistViewItem = listViewItemList[position]
+        stockNameTextView.text = curlistViewItem.stockNameStr
+        stockPriceTextView.text = curlistViewItem.stockPriceStr
+        stockRateTextView.text = curlistViewItem.stockRateStr
 
-        val listViewItem = listViewItemList[position]
 
-        //각 값들 대입, 형식 변환, 색상 결정
-        val stocksetting: StockSetting = StockSetting()
-
-        stockNameTextView.text = listViewItem.stockNameStr
-        stockPriceTextView.text = listViewItem.stockPriceStr
-        stockRateTextView.text = listViewItem.stockRateStr
+        //색상 결정
 /*
-        if(listViewItem.stockRateStr?.toDouble()!!>=0){
+        if(curlistViewItem.stockRateStr?.toDouble()!!>=0){
             stockRateTextView.setTextColor(Color.parseColor("#FF0000"))
         }else{
             stockRateTextView.setTextColor(Color.parseColor("#0000FF"))
         }*/
 
         //LongClick -> edit mode
-        val listviewItem = view.findViewById<LinearLayout>(R.id.listview_item)
+        val listviewItem = view!!.findViewById<LinearLayout>(R.id.listview_item)
         listviewItem.setOnLongClickListener(View.OnLongClickListener{
             this.setCheckBoxVisible()
             this.isRemoveMode = true
@@ -93,21 +93,30 @@ class ListViewAdapter : BaseAdapter(){
         item.stockNameStr = stockName
         item.stockPriceStr = "0"
         item.stockRateStr = "0"
+        item.stockPriceFluctuationStr = "0"
         listViewItemList.add(item)
-        this.refreshStock(listViewItemList.size-1)
+        this.refreshStockList(listViewItemList.size-1)
     }
-    fun refreshStock(index: Int){
+    fun refreshStockList(index: Int){ //TODO: 오류 수정 구간
         val rThread = Thread(
                 Runnable {
                     try {
+                        Log.e("START", index.toString())
                         val url = "https://www.google.com/search?q=" + listViewItemList[index].stockNameStr + "&tbm=fin"
-                        val doc = Jsoup.connect(url).timeout(1000 * 10).get()
-                        val priceData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > span:nth-child(1) > span > span:nth-child(1)")
-                        val rateData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > span:nth-child(2) > span:nth-child(2) > span:nth-child(1)")
-                        Log.e("MainActivity", priceData.size.toString())
-                        // TODO: 2021-02-24 쓰레드 안은 동기식인데 왜 select가 끝나지 않았는데 .. 머 암튼 검색이 되다가 안 되다라 반반
-                        listViewItemList[index].stockPriceStr = priceData.text().toString()
-                        listViewItemList[index].stockRateStr = rateData.text().toString()
+                        val doc = Jsoup.connect(url)
+                                .timeout(1500)
+                                .get()
+                        val priceData = doc.select("body > c-wiz > div > div:nth-child(3) > main > div:nth-child(2) > c-wiz > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div > span > div > div").last()
+                        //val elemBeforeRateData = doc.select("body > c-wiz > div > div:nth-child(3) > main > div:nth-child(2) > c-wiz > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(2) > div > span:nth-child(1) > div > div > span")
+                        //Log.e("selected", index.toString()+elemBeforeRateData)
+                        //val rateData = elemBeforeRateData.last().nextElementSibling()
+                        Log.e("nextelemt", index.toString())
+                        val priceFluctuationData = doc.select("body> c-wiz > div > div:nth-child(3) > main > div:nth-child(2) > c-wiz > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(2) > div > span:nth-child(1) > div > div").last()
+                        listViewItemList[index].stockPriceStr = priceData.text()
+                        //listViewItemList[index].stockRateStr = rateData.html()
+                        //listViewItemList[index].stockPriceFluctuationStr = priceFluctuationData.text()
+                        //Log.e("END", index.toString()+"["+rateData.text()+"]")
+                        this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, index)
                         this.notifyDataSetChanged()
                     } catch (e: Exception) {
                         e.printStackTrace()

@@ -8,6 +8,7 @@ import android.os.Looper
 import android.util.Log
 import android.view.View
 import android.view.View.OnFocusChangeListener
+import android.view.ViewGroup
 import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
@@ -18,25 +19,37 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.iterator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
+public interface InterfaceMainActivity{
+    fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int)
+}
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         // ActionBar Customize
         supportActionBar?.title = "관심 종목"
-
         //ListView
         val listview: ListView = findViewById<View>(R.id.stock_list_view) as ListView
-        val adapter: ListViewAdapter = ListViewAdapter()
+        val adapter = ListViewAdapter()
+        adapter.interfaceMainActivity = object: InterfaceMainActivity{
+            override fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int) {
+                //각 값들 View에 적용
+                val curView = viewGroupParent.getChildAt(index)
+                val stockPriceTextView = curView.findViewById<TextView>(R.id.text_stock_price)
+                val stockRateTextView = curView.findViewById<TextView>(R.id.text_stock_rate)
+
+                stockPriceTextView.text = listViewItemList[index].stockPriceStr
+                stockRateTextView.text = listViewItemList[index].stockRateStr
+            }
+        }
         adapter.rootView = findViewById<View>(android.R.id.content).rootView
         listview.adapter = adapter
+
 
         //Default
         adapter.addItem("NAVER")
         adapter.addItem("LG디스플레이")
-        adapter.addItem("SK하이닉스")
         adapter.addItem("삼성전자")
 
         // + / x Btn
