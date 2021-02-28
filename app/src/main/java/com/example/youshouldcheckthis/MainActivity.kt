@@ -21,6 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 public interface InterfaceMainActivity{
     fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int)
+    fun makeToastText(text: String, lengthToast:Int)
 }
 
 class MainActivity : AppCompatActivity() {
@@ -34,14 +35,16 @@ class MainActivity : AppCompatActivity() {
         val adapter = ListViewAdapter()
         adapter.interfaceMainActivity = object: InterfaceMainActivity{
             override fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int) {
-                //각 값들 View에 적용
-                val curView = viewGroupParent.getChildAt(index)
-                val stockPriceTextView = curView.findViewById<TextView>(R.id.text_stock_price)
-                val stockRateTextView = curView.findViewById<TextView>(R.id.text_stock_rate)
-
-                stockPriceTextView.text = listViewItemList[index].stockPriceStr
-                stockRateTextView.text = listViewItemList[index].stockRateStr
+                runOnUiThread{
+                    adapter.notifyDataSetChanged()
+                }
             }
+            override fun makeToastText(text: String, lengthToast:Int){
+                runOnUiThread{
+                    Toast.makeText(baseContext, text, lengthToast).show()
+                }
+            }
+
         }
         adapter.rootView = findViewById<View>(android.R.id.content).rootView
         listview.adapter = adapter
@@ -51,6 +54,7 @@ class MainActivity : AppCompatActivity() {
         adapter.addItem("NAVER")
         adapter.addItem("LG디스플레이")
         adapter.addItem("삼성전자")
+        adapter.addItem("애플")
 
         // + / x Btn
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
@@ -89,7 +93,9 @@ class MainActivity : AppCompatActivity() {
             }
             adapter.isRemoveMode = false
             adapter.setCheckBoxInvisible()
-            adapter.notifyDataSetChanged()
+            runOnUiThread{
+                adapter.notifyDataSetChanged()
+            }
         }
     }
 }

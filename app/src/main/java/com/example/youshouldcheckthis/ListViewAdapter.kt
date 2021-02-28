@@ -7,6 +7,7 @@ package com.example.youshouldcheckthis
  import android.os.Handler
  import android.os.Looper
  import android.os.Message
+ import android.os.SystemClock
  import android.text.Layout
  import android.util.Log
  import android.util.TypedValue
@@ -33,7 +34,6 @@ class ListViewAdapter : BaseAdapter(){
     }
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
-        Log.e("MainActivity", "VIEW"+position.toString())
         var view = convertView
         val context = parent.context
         this.viewGroupParent = parent
@@ -44,20 +44,25 @@ class ListViewAdapter : BaseAdapter(){
         //list를 View에 대입
         val stockNameTextView = view!!.findViewById<TextView>(R.id.text_stock_name)
         val stockPriceTextView = view.findViewById<TextView>(R.id.text_stock_price)
+        val stockPriceUnitTextView = view.findViewById<TextView>(R.id.text_stock_price_unit)
         val stockRateTextView = view.findViewById<TextView>(R.id.text_stock_rate)
+        val stockPriceFluctuationTextView = view.findViewById<TextView>(R.id.text_stock_price_fluctuation)
         val curlistViewItem = listViewItemList[position]
         stockNameTextView.text = curlistViewItem.stockNameStr
         stockPriceTextView.text = curlistViewItem.stockPriceStr
+        stockPriceUnitTextView.text = curlistViewItem.stockPriceUnitStr
         stockRateTextView.text = curlistViewItem.stockRateStr
+        stockPriceFluctuationTextView.text = curlistViewItem.stockPriceFluctuationStr
 
 
         //색상 결정
-/*
-        if(curlistViewItem.stockRateStr?.toDouble()!!>=0){
+        if(curlistViewItem.stockPriceFluctuationStr!![0]=='+'){
             stockRateTextView.setTextColor(Color.parseColor("#FF0000"))
+            stockPriceFluctuationTextView.setTextColor(Color.parseColor("#FF0000"))
         }else{
             stockRateTextView.setTextColor(Color.parseColor("#0000FF"))
-        }*/
+            stockPriceFluctuationTextView.setTextColor(Color.parseColor("#0000FF"))
+        }
 
         //LongClick -> edit mode
         val listviewItem = view!!.findViewById<LinearLayout>(R.id.listview_item)
@@ -95,31 +100,35 @@ class ListViewAdapter : BaseAdapter(){
         item.stockRateStr = "0"
         item.stockPriceFluctuationStr = "0"
         listViewItemList.add(item)
-        this.refreshStockList(listViewItemList.size-1)
+        this.refreshStockList(listViewItemList.size-1, 0)
     }
-    fun refreshStockList(index: Int){ //TODO: 오류 수정 구간
+    fun refreshStockList(index: Int, cntTry: Int){
+        if (cntTry>=10){
+            this.interfaceMainActivity.makeToastText("종목을 불러오는 데 실패하였습니다. 종목명 및 인터넷 연결 유무를 확인해주세요.", Toast.LENGTH_LONG)
+            return
+        }
         val rThread = Thread(
                 Runnable {
                     try {
-                        Log.e("START", index.toString())
-                        val url = "https://www.google.com/search?q=" + listViewItemList[index].stockNameStr + "&tbm=fin"
+                        val url = "https://www.google.com/search?q=" + listViewItemList[index].stockNameStr + "%20주가"
                         val doc = Jsoup.connect(url)
                                 .timeout(1500)
                                 .get()
-                        val priceData = doc.select("body > c-wiz > div > div:nth-child(3) > main > div:nth-child(2) > c-wiz > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div > span > div > div").last()
-                        //val elemBeforeRateData = doc.select("body > c-wiz > div > div:nth-child(3) > main > div:nth-child(2) > c-wiz > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(2) > div > span:nth-child(1) > div > div > span")
-                        //Log.e("selected", index.toString()+elemBeforeRateData)
-                        //val rateData = elemBeforeRateData.last().nextElementSibling()
-                        Log.e("nextelemt", index.toString())
-                        val priceFluctuationData = doc.select("body> c-wiz > div > div:nth-child(3) > main > div:nth-child(2) > c-wiz > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(1) > div:nth-child(1) > div > div:nth-child(2) > div > span:nth-child(1) > div > div").last()
+
+                        val priceData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(1) > span > span:nth-child(1)").last()
+                        val priceUnitData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(1) > span > span:nth-child(2)").last()
+                        val rateData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2)> div:nth-child(1) > span:nth-child(2) > span:nth-child(2) > span:nth-child(1)").last()
+                        val priceFluctuationData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(2) > span:nth-child(1)").last()
+
                         listViewItemList[index].stockPriceStr = priceData.text()
-                        //listViewItemList[index].stockRateStr = rateData.html()
-                        //listViewItemList[index].stockPriceFluctuationStr = priceFluctuationData.text()
-                        //Log.e("END", index.toString()+"["+rateData.text()+"]")
+                        listViewItemList[index].stockPriceUnitStr = priceUnitData.text()
+                        listViewItemList[index].stockRateStr = rateData.text()
+                        listViewItemList[index].stockPriceFluctuationStr = priceFluctuationData.text()
                         this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, index)
-                        this.notifyDataSetChanged()
-                    } catch (e: Exception) {
-                        e.printStackTrace()
+                    } catch (e: Exception) { //엘리멘트 로드 실패
+                        this.interfaceMainActivity.makeToastText("종목을 불러오는 데 실패하여 재시도합니다.", Toast.LENGTH_SHORT)
+                        SystemClock.sleep(1000)
+                        this.refreshStockList(index, cntTry+1)
                     }
                 }
         )

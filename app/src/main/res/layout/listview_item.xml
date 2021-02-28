@@ -20,15 +20,49 @@
         android:id="@+id/stock_layout"
         android:layout_weight="9"
         >
-        <TextView
+        <LinearLayout
+            android:orientation="horizontal"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/text_stock_name"
-            android:textSize="32dp"
-            android:textColor="#000000"
-            android:textStyle="bold"
-            />
+            android:layout_marginTop="4dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="Defalut"
+                android:id="@+id/text_stock_name"
+                android:textSize="24dp"
+                android:textColor="#000000"
+                />
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            >
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="00,000"
+                android:id="@+id/text_stock_price"
+                android:textSize="40dp"
+                android:textColor="#000000"
+                android:textStyle="bold"
+                />
+            <TextView
+                android:layout_marginLeft="8dp"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="DFT"
+                android:id="@+id/text_stock_price_unit"
+                android:textSize="40dp"
+                android:textColor="#343a40"
+                />
+        </LinearLayout>
+
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
@@ -39,9 +73,9 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
-                android:text="New Text"
-                android:id="@+id/text_stock_price"
-                android:textSize="24dp"
+                android:text="+0,000"
+                android:id="@+id/text_stock_price_fluctuation"
+                android:textSize="32dp"
                 android:textColor="#000000"
                 android:gravity="center"
                 />
@@ -50,9 +84,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:layout_marginLeft="8dp"
-                android:text="New Text"
+                android:text="(0.00%)"
                 android:id="@+id/text_stock_rate"
-                android:textSize="24dp"
+                android:textSize="32dp"
                 android:textColor="#000000"
                 android:gravity="center"
                 />
