@@ -23,7 +23,7 @@ package com.example.youshouldcheckthis
 import kotlin.coroutines.*
 
 class ListViewAdapter : BaseAdapter(){
-    private var listViewItemList = ArrayList<ListViewItem>()
+    public var listViewItemList = ArrayList<ListViewItem>()
     public var isRemoveMode = false
     private lateinit var viewGroupParent:ViewGroup
     public lateinit var rootView:View
@@ -101,9 +101,22 @@ class ListViewAdapter : BaseAdapter(){
         item.stockPriceFluctuationStr = "0"
         listViewItemList.add(item)
         this.refreshStockList(listViewItemList.size-1, 0)
+        this.interfaceMainActivity.setPreferenceStockList(this.listViewItemList)
+    }
+    fun refreshAllStockList(isPeriodic:Boolean){
+        var i: Int = 0
+        for(i in 0 until this.count){
+            if(isPeriodic&&(listViewItemList[i].stockPriceStr=="0"||listViewItemList[i].stockRateStr=="0"||listViewItemList[i].stockPriceFluctuationStr=="0")){
+                continue
+            }
+            this.refreshStockList(i, 0)
+        }
     }
     fun refreshStockList(index: Int, cntTry: Int){
-        if (cntTry>=10){
+        if(cntTry in 2..9){
+            this.interfaceMainActivity.makeToastText("종목을 불러오는 데 실패하여 재시도합니다.", Toast.LENGTH_SHORT)
+        }
+        else if (cntTry>=10){
             this.interfaceMainActivity.makeToastText("종목을 불러오는 데 실패하였습니다. 종목명 및 인터넷 연결 유무를 확인해주세요.", Toast.LENGTH_LONG)
             return
         }
@@ -126,7 +139,6 @@ class ListViewAdapter : BaseAdapter(){
                         listViewItemList[index].stockPriceFluctuationStr = priceFluctuationData.text()
                         this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, index)
                     } catch (e: Exception) { //엘리멘트 로드 실패
-                        this.interfaceMainActivity.makeToastText("종목을 불러오는 데 실패하여 재시도합니다.", Toast.LENGTH_SHORT)
                         SystemClock.sleep(1000)
                         this.refreshStockList(index, cntTry+1)
                     }
