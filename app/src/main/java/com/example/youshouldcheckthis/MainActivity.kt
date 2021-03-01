@@ -74,10 +74,16 @@ class MainActivity : AppCompatActivity() {
 
         //Load Stocks From Preference To Adapter
         val tmp = adapter.interfaceMainActivity.getPreferenceStockList()
-        if(tmp!=null){
+        if(tmp!=null) {
             adapter.listViewItemList = tmp
             adapter.refreshAllStockList(false)
         }
+
+        //Load Setting
+        var setting = Setting()
+        adapter.setting = setting
+
+
 
         // + / x Btn
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
@@ -107,20 +113,30 @@ class MainActivity : AppCompatActivity() {
 
         //Remove Btn
         findViewById<FloatingActionButton>(R.id.fab_remove).setOnClickListener {
+            var todo = arrayListOf<Int>()
             var i:Int= 0
             for(i in listview.count-1 downTo 0){
                 val curCheckBox = listview.getChildAt(i).findViewById<CheckBox>(R.id.checkbox)
                 if(curCheckBox.isChecked){
-                    adapter.removeItem(i)
+                    todo.add(i)
                 }
             }
-            adapter.isRemoveMode = false
             adapter.setCheckBoxInvisible()
+            adapter.isRemoveMode = false
+            for(i in todo){
+                adapter.removeItem(i)
+            }
             adapter.interfaceMainActivity.setPreferenceStockList(adapter.listViewItemList)
             runOnUiThread{
                 adapter.notifyDataSetChanged()
             }
         }
+
+        //Alarm Btn
+        /*val btnStockAlarm = findViewById<Button>(R.id.btn_stock_alarm)
+        btnStockAlarm.setOnClickListener { //TODO: listview_item에 alarm on/off 구현 이후에 수정
+            btnStockAlarm.background
+        }*/
 
         //Periodic Refresh
         Thread(

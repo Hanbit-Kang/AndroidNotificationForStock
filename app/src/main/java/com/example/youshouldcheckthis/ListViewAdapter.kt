@@ -1,6 +1,7 @@
 package com.example.youshouldcheckthis
 
  import android.animation.ValueAnimator
+ import android.app.ActionBar
  import android.content.Context
  import android.content.Intent
  import android.graphics.Color
@@ -20,7 +21,11 @@ package com.example.youshouldcheckthis
  import androidx.core.content.ContextCompat
  import com.google.android.material.floatingactionbutton.FloatingActionButton
  import org.jsoup.Jsoup
-import kotlin.coroutines.*
+ import java.text.SimpleDateFormat
+ import java.time.LocalDateTime
+ import java.util.*
+ import kotlin.collections.ArrayList
+ import kotlin.coroutines.*
 
 class ListViewAdapter : BaseAdapter(){
     public var listViewItemList = ArrayList<ListViewItem>()
@@ -28,6 +33,7 @@ class ListViewAdapter : BaseAdapter(){
     private lateinit var viewGroupParent:ViewGroup
     public lateinit var rootView:View
     public lateinit var interfaceMainActivity:InterfaceMainActivity
+    public lateinit var setting:Setting
 
     override fun getCount(): Int{
         return listViewItemList.size
@@ -47,21 +53,26 @@ class ListViewAdapter : BaseAdapter(){
         val stockPriceUnitTextView = view.findViewById<TextView>(R.id.text_stock_price_unit)
         val stockRateTextView = view.findViewById<TextView>(R.id.text_stock_rate)
         val stockPriceFluctuationTextView = view.findViewById<TextView>(R.id.text_stock_price_fluctuation)
+        val stockUpdatedAt = view.findViewById<TextView>(R.id.text_stock_updatedAt)
         val curlistViewItem = listViewItemList[position]
         stockNameTextView.text = curlistViewItem.stockNameStr
         stockPriceTextView.text = curlistViewItem.stockPriceStr
         stockPriceUnitTextView.text = curlistViewItem.stockPriceUnitStr
         stockRateTextView.text = curlistViewItem.stockRateStr
         stockPriceFluctuationTextView.text = curlistViewItem.stockPriceFluctuationStr
+        stockUpdatedAt.text = curlistViewItem.stockUpdatedAt
 
 
         //색상 결정
+        val stockArrowView = view.findViewById<ImageView>(R.id.stock_arrow)
         if(curlistViewItem.stockPriceFluctuationStr!![0]=='+'){
             stockRateTextView.setTextColor(Color.parseColor("#FF0000"))
             stockPriceFluctuationTextView.setTextColor(Color.parseColor("#FF0000"))
+            stockArrowView.background = context.resources.getDrawable(R.drawable.ic_baseline_arrow_drop_up)
         }else{
             stockRateTextView.setTextColor(Color.parseColor("#0000FF"))
             stockPriceFluctuationTextView.setTextColor(Color.parseColor("#0000FF"))
+            stockArrowView.background = context.resources.getDrawable(R.drawable.ic_baseline_arrow_drop_down)
         }
 
         //LongClick -> edit mode
@@ -99,6 +110,8 @@ class ListViewAdapter : BaseAdapter(){
         item.stockPriceStr = "0"
         item.stockRateStr = "0"
         item.stockPriceFluctuationStr = "0"
+        item.stockIncreaseRateLimit = this.setting.increaseRateLimit
+        item.stockDecreaseRateLimit = this.setting.decreaseRateLimit
         listViewItemList.add(item)
         this.refreshStockList(listViewItemList.size-1, 0)
         this.interfaceMainActivity.setPreferenceStockList(this.listViewItemList)
@@ -135,8 +148,11 @@ class ListViewAdapter : BaseAdapter(){
 
                         listViewItemList[index].stockPriceStr = priceData.text()
                         listViewItemList[index].stockPriceUnitStr = priceUnitData.text()
-                        listViewItemList[index].stockRateStr = rateData.text()
+                        listViewItemList[index].stockRateStr = rateData.text().substring(1, rateData.text().length-1)
                         listViewItemList[index].stockPriceFluctuationStr = priceFluctuationData.text()
+                        val curTime = Date(System.currentTimeMillis())
+                        val dateFormat = SimpleDateFormat("MM.dd HH:mm", Locale("ko", "KR"))
+                        listViewItemList[index].stockUpdatedAt = dateFormat.format(curTime)
                         this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, index)
                     } catch (e: Exception) { //엘리멘트 로드 실패
                         SystemClock.sleep(1000)
@@ -155,7 +171,16 @@ class ListViewAdapter : BaseAdapter(){
         for(i in 0 until this.count){
             val curView:View = this.viewGroupParent.getChildAt(i)
             val checkboxLayout = curView.findViewById<LinearLayout>(R.id.checkbox_layout)
-            checkboxLayout.visibility = View.VISIBLE
+            val checkbox = curView.findViewById<CheckBox>(R.id.checkbox)
+            checkbox.visibility = View.VISIBLE
+            var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
+            params.weight = 1f
+            checkboxLayout.layoutParams = params
+
+            val stockLayout = curView.findViewById<LinearLayout>(R.id.stock_layout)
+            params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
+            params.weight = 5f
+            stockLayout.layoutParams = params
         }
 
         var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
@@ -188,8 +213,16 @@ class ListViewAdapter : BaseAdapter(){
             val curView:View = this.viewGroupParent.getChildAt(i)
             val checkboxLayout = curView.findViewById<LinearLayout>(R.id.checkbox_layout)
             val checkbox = curView.findViewById<CheckBox>(R.id.checkbox)
-            checkboxLayout.visibility = View.INVISIBLE
+            checkbox.visibility = View.INVISIBLE
             checkbox.isChecked = false
+            var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
+            params.weight = 0f
+            checkboxLayout.layoutParams = params
+
+            val stockLayout = curView.findViewById<LinearLayout>(R.id.stock_layout)
+            params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
+            params.weight = 6f
+            stockLayout.layoutParams = params
         }
 
         var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
