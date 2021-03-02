@@ -10,6 +10,7 @@ class ListViewItem {
     var stockRateStr: String? = null
     var stockPriceFluctuationStr: String? = null
     var stockUpdatedAt: String? = null
+    var stockAlarm: Boolean = false
     var stockIncreaseRateLimit: Float? = null
     var stockDecreaseRateLimit: Float? = null
 }

@@ -4,6 +4,7 @@ package com.example.youshouldcheckthis
  import android.app.ActionBar
  import android.content.Context
  import android.content.Intent
+ import android.content.res.ColorStateList
  import android.graphics.Color
  import android.os.Handler
  import android.os.Looper
@@ -47,6 +48,7 @@ class ListViewAdapter : BaseAdapter(){
             val inflater = context.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.listview_item, parent, false)
         }
+
         //list를 View에 대입
         val stockNameTextView = view!!.findViewById<TextView>(R.id.text_stock_name)
         val stockPriceTextView = view.findViewById<TextView>(R.id.text_stock_price)
@@ -74,6 +76,14 @@ class ListViewAdapter : BaseAdapter(){
             stockPriceFluctuationTextView.setTextColor(Color.parseColor("#0000FF"))
             stockArrowView.background = context.resources.getDrawable(R.drawable.ic_baseline_arrow_drop_down)
         }
+        
+        //item의 alarmMode true/false -> 알람 아이콘 변경
+        val btnStockAlarmView = view.findViewById<ImageButton>(R.id.btn_stock_alarm)
+        if(curlistViewItem.stockAlarm){
+            btnStockAlarmView.background = context.resources.getDrawable(R.drawable.ic_baseline_alarm_on)
+        }else{
+            btnStockAlarmView.background = context.resources.getDrawable(R.drawable.ic_baseline_alarm_off)
+        }
 
         //LongClick -> edit mode
         val listviewItem = view!!.findViewById<LinearLayout>(R.id.listview_item)
@@ -91,6 +101,13 @@ class ListViewAdapter : BaseAdapter(){
             if(checkbox.visibility==View.VISIBLE){
                 checkbox.isChecked = checkbox.isChecked==false
             }
+            true
+        })
+
+        //Item - Alarm Btn Click
+        btnStockAlarmView.setOnClickListener(View.OnClickListener {
+            curlistViewItem.stockAlarm = !curlistViewItem.stockAlarm
+            this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, position)
             true
         })
         return view
@@ -145,14 +162,12 @@ class ListViewAdapter : BaseAdapter(){
                         val priceUnitData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(1) > span > span:nth-child(2)").last()
                         val rateData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2)> div:nth-child(1) > span:nth-child(2) > span:nth-child(2) > span:nth-child(1)").last()
                         val priceFluctuationData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(2) > span:nth-child(1)").last()
-
+                        val updatedAtData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > span:nth-child(1) > span:nth-child(2)").last()
                         listViewItemList[index].stockPriceStr = priceData.text()
                         listViewItemList[index].stockPriceUnitStr = priceUnitData.text()
                         listViewItemList[index].stockRateStr = rateData.text().substring(1, rateData.text().length-1)
                         listViewItemList[index].stockPriceFluctuationStr = priceFluctuationData.text()
-                        val curTime = Date(System.currentTimeMillis())
-                        val dateFormat = SimpleDateFormat("MM.dd HH:mm", Locale("ko", "KR"))
-                        listViewItemList[index].stockUpdatedAt = dateFormat.format(curTime)
+                        listViewItemList[index].stockUpdatedAt = updatedAtData.text().substring(0, updatedAtData.text().length-8)
                         this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, index)
                     } catch (e: Exception) { //엘리멘트 로드 실패
                         SystemClock.sleep(1000)

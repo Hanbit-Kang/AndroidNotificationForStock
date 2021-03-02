@@ -83,8 +83,6 @@ class MainActivity : AppCompatActivity() {
         var setting = Setting()
         adapter.setting = setting
 
-
-
         // + / x Btn
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
             if(adapter.isRemoveMode){ // x Btn -> Cancel
@@ -131,12 +129,6 @@ class MainActivity : AppCompatActivity() {
                 adapter.notifyDataSetChanged()
             }
         }
-
-        //Alarm Btn
-        /*val btnStockAlarm = findViewById<Button>(R.id.btn_stock_alarm)
-        btnStockAlarm.setOnClickListener { //TODO: listview_item에 alarm on/off 구현 이후에 수정
-            btnStockAlarm.background
-        }*/
 
         //Periodic Refresh
         Thread(

@@ -142,13 +142,12 @@
         android:id="@+id/stock_setting_layout"
         >
 
-        <Button
+        <ImageButton
             android:id="@+id/btn_stock_alarm"
             android:layout_width="35dp"
             android:layout_height="35dp"
             android:layout_gravity="center"
-            android:background="@drawable/ic_baseline_alarm_on"
-            android:backgroundTint="#19CE60"
-            app:backgroundTint="#19CE60" />
+            android:background="@drawable/ic_baseline_alarm_off"
+            />
     </LinearLayout>
 </LinearLayout>
