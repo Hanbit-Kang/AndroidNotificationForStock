@@ -2,19 +2,19 @@ package com.example.youshouldcheckthis
 
 import android.content.Context
 import android.content.DialogInterface
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import android.view.View
+import android.view.*
 import android.view.View.OnFocusChangeListener
-import android.view.ViewGroup
-import android.view.WindowManager
 import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
+import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.iterator
@@ -37,7 +37,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         // ActionBar Customize
-        supportActionBar?.title = "관심 종목"
+        supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
+        supportActionBar?.setCustomView(R.layout.abs_layout)
+        findViewById<TextView>(R.id.abs_id).text = "관심 종목"
 
         //ListView
         val listview: ListView = findViewById<View>(R.id.stock_list_view) as ListView
@@ -137,12 +139,27 @@ class MainActivity : AppCompatActivity() {
                         while(true){
                             adapter.refreshAllStockList(true)
                             Log.i("MainActivity","PeriodicRefreshThread")
-                            Thread.sleep(10000)
+                            Thread.sleep(60000)
                         }
                     }catch(e:Exception){
                         e.printStackTrace()
                     }
                 }
         ).start()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.menu_setting, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if(item.itemId==R.id.settingItem) {
+            val intent = Intent(this, SettingActivity::class.java)
+            startActivity(intent)
+            overridePendingTransition(R.anim.to_left, R.anim.none)
+        }
+        return super.onOptionsItemSelected(item)
     }
 }

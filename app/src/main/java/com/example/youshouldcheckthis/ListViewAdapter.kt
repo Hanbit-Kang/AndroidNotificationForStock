@@ -108,6 +108,7 @@ class ListViewAdapter : BaseAdapter(){
         btnStockAlarmView.setOnClickListener(View.OnClickListener {
             curlistViewItem.stockAlarm = !curlistViewItem.stockAlarm
             this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, position)
+            this.interfaceMainActivity.setPreferenceStockList(this.listViewItemList)
             true
         })
         return view
