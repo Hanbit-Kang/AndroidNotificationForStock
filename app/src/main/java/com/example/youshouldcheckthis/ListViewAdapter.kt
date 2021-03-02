@@ -33,8 +33,7 @@ class ListViewAdapter : BaseAdapter(){
     public var isRemoveMode = false
     private lateinit var viewGroupParent:ViewGroup
     public lateinit var rootView:View
-    public lateinit var interfaceMainActivity:InterfaceMainActivity
-    public lateinit var setting:Setting
+    public lateinit var interfaceMainActivityForAdapter:InterfaceMainActivityForAdapter
 
     override fun getCount(): Int{
         return listViewItemList.size
@@ -90,14 +89,14 @@ class ListViewAdapter : BaseAdapter(){
         listviewItem.setOnLongClickListener(View.OnLongClickListener{
             this.setCheckBoxVisible()
             this.isRemoveMode = true
-            val checkbox = view.findViewById<CheckBox>(R.id.checkbox)
+            val checkbox = view.findViewById<CheckBox>(R.id.stock_checkbox)
             checkbox.isChecked = true
             true
         })
 
         //Item click(not only checkbox) -> checked
         listviewItem.setOnClickListener(View.OnClickListener{
-            val checkbox = view.findViewById<CheckBox>(R.id.checkbox)
+            val checkbox = view.findViewById<CheckBox>(R.id.stock_checkbox)
             if(checkbox.visibility==View.VISIBLE){
                 checkbox.isChecked = checkbox.isChecked==false
             }
@@ -107,8 +106,8 @@ class ListViewAdapter : BaseAdapter(){
         //Item - Alarm Btn Click
         btnStockAlarmView.setOnClickListener(View.OnClickListener {
             curlistViewItem.stockAlarm = !curlistViewItem.stockAlarm
-            this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, position)
-            this.interfaceMainActivity.setPreferenceStockList(this.listViewItemList)
+            this.interfaceMainActivityForAdapter.refreshStockView(viewGroupParent, listViewItemList, position)
+            this.interfaceMainActivityForAdapter.setPreferenceStockList(this.listViewItemList)
             true
         })
         return view
@@ -128,11 +127,9 @@ class ListViewAdapter : BaseAdapter(){
         item.stockPriceStr = "0"
         item.stockRateStr = "0"
         item.stockPriceFluctuationStr = "0"
-        item.stockIncreaseRateLimit = this.setting.increaseRateLimit
-        item.stockDecreaseRateLimit = this.setting.decreaseRateLimit
         listViewItemList.add(item)
         this.refreshStockList(listViewItemList.size-1, 0)
-        this.interfaceMainActivity.setPreferenceStockList(this.listViewItemList)
+        this.interfaceMainActivityForAdapter.setPreferenceStockList(this.listViewItemList)
     }
     fun refreshAllStockList(isPeriodic:Boolean){
         var i: Int = 0
@@ -145,10 +142,10 @@ class ListViewAdapter : BaseAdapter(){
     }
     fun refreshStockList(index: Int, cntTry: Int){
         if(cntTry in 2..9){
-            this.interfaceMainActivity.makeToastText("종목을 불러오는 데 실패하여 재시도합니다.", Toast.LENGTH_SHORT)
+            this.interfaceMainActivityForAdapter.makeToastText("종목을 불러오는 데 실패하여 재시도합니다.", Toast.LENGTH_SHORT)
         }
         else if (cntTry>=10){
-            this.interfaceMainActivity.makeToastText("종목을 불러오는 데 실패하였습니다. 종목명 및 인터넷 연결 유무를 확인해주세요.", Toast.LENGTH_LONG)
+            this.interfaceMainActivityForAdapter.makeToastText("종목을 불러오는 데 실패하였습니다. 종목명 및 인터넷 연결 유무를 확인해주세요.", Toast.LENGTH_LONG)
             return
         }
         val rThread = Thread(
@@ -169,7 +166,7 @@ class ListViewAdapter : BaseAdapter(){
                         listViewItemList[index].stockRateStr = rateData.text().substring(1, rateData.text().length-1)
                         listViewItemList[index].stockPriceFluctuationStr = priceFluctuationData.text()
                         listViewItemList[index].stockUpdatedAt = updatedAtData.text().substring(0, updatedAtData.text().length-8)
-                        this.interfaceMainActivity.refreshStockView(viewGroupParent, listViewItemList, index)
+                        this.interfaceMainActivityForAdapter.refreshStockView(viewGroupParent, listViewItemList, index)
                     } catch (e: Exception) { //엘리멘트 로드 실패
                         SystemClock.sleep(1000)
                         this.refreshStockList(index, cntTry+1)
@@ -187,7 +184,7 @@ class ListViewAdapter : BaseAdapter(){
         for(i in 0 until this.count){
             val curView:View = this.viewGroupParent.getChildAt(i)
             val checkboxLayout = curView.findViewById<LinearLayout>(R.id.checkbox_layout)
-            val checkbox = curView.findViewById<CheckBox>(R.id.checkbox)
+            val checkbox = curView.findViewById<CheckBox>(R.id.stock_checkbox)
             checkbox.visibility = View.VISIBLE
             var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
             params.weight = 1f
@@ -228,7 +225,7 @@ class ListViewAdapter : BaseAdapter(){
         for(i in 0 until this.count){
             val curView:View = this.viewGroupParent.getChildAt(i)
             val checkboxLayout = curView.findViewById<LinearLayout>(R.id.checkbox_layout)
-            val checkbox = curView.findViewById<CheckBox>(R.id.checkbox)
+            val checkbox = curView.findViewById<CheckBox>(R.id.stock_checkbox)
             checkbox.visibility = View.INVISIBLE
             checkbox.isChecked = false
             var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)

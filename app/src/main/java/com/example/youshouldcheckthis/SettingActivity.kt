@@ -30,7 +30,6 @@ class SettingActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-
         overridePendingTransition(R.anim.none, R.anim.to_right)
     }
 }

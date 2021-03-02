@@ -3,12 +3,103 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-    <TextView
-        android:layout_width="wrap_content"
+    android:layout_height="match_parent"
+    >
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="0.00%"
-        android:textSize="24dp"
-        android:textColor="#000000"
-        tools:ignore="MissingConstraints" />
+        android:orientation="vertical"
+        tools:ignore="MissingConstraints"
+        android:padding="24dp"
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="알람 발생 조건"
+            android:textSize="32dp"
+            android:textColor="#000000"
+            android:layout_marginBottom="8dp"
+            tools:ignore="MissingConstraints" />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            >
+            <CheckBox
+                android:id="@+id/setting_increase"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:button="@null"
+                android:background="@drawable/selector_checkbox"
+                android:layout_gravity="center"
+                android:layout_marginRight="16sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일일 "
+                android:textSize="24dp"
+                android:textColor="#000000"
+                />
+            <EditText
+                android:minWidth="54dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24dp"
+                android:gravity="end"
+                android:inputType="numberDecimal"
+                android:maxLength="4"
+                android:text="12.5"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="% 상승 시"
+                android:textSize="24dp"
+                android:textColor="#000000"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginLeft="8dp"
+            >
+            <CheckBox
+                android:id="@+id/setting_decrease"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:button="@null"
+                android:background="@drawable/selector_checkbox"
+                android:layout_gravity="center"
+                android:layout_marginRight="16sp"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="일일 "
+                android:textSize="24dp"
+                android:textColor="#000000"
+                />
+            <EditText
+                android:minWidth="54dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="24dp"
+                android:gravity="end"
+                android:inputType="numberDecimal"
+                android:maxLength="4"
+                android:text="12.5"
+                />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="% 하락 시"
+                android:textSize="24dp"
+                android:textColor="#000000"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

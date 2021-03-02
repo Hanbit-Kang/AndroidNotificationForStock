@@ -1,6 +1,8 @@
 package com.example.youshouldcheckthis
 
 class Setting {
-    var increaseRateLimit: Float? = null
-    var decreaseRateLimit: Float? = null
+    var increaseAlarm: Boolean? = false
+    var decreaseAlarm: Boolean? = false
+    var increaseRateLimit: Float? = 3f
+    var decreaseRateLimit: Float? = 3f
 }

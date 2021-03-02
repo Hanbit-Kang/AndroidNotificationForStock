@@ -23,7 +23,7 @@ import com.google.gson.GsonBuilder
 import com.google.gson.internal.GsonBuildConfig
 import com.google.gson.reflect.TypeToken
 
-public interface InterfaceMainActivity{
+public interface InterfaceMainActivityForAdapter{
     fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int)
     fun makeToastText(text: String, lengthToast:Int)
     fun setPreferenceStockList(list: ArrayList<ListViewItem>)
@@ -31,7 +31,8 @@ public interface InterfaceMainActivity{
 }
 
 class MainActivity : AppCompatActivity() {
-    public var mToast:Toast? = null
+    private var mToast:Toast? = null
+    private var setting = Setting()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -44,7 +45,7 @@ class MainActivity : AppCompatActivity() {
         //ListView
         val listview: ListView = findViewById<View>(R.id.stock_list_view) as ListView
         val adapter = ListViewAdapter()
-        adapter.interfaceMainActivity = object: InterfaceMainActivity{
+        adapter.interfaceMainActivityForAdapter = object: InterfaceMainActivityForAdapter{
             override fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int) {
                 runOnUiThread{
                     adapter.notifyDataSetChanged()
@@ -75,15 +76,14 @@ class MainActivity : AppCompatActivity() {
         listview.adapter = adapter
 
         //Load Stocks From Preference To Adapter
-        val tmp = adapter.interfaceMainActivity.getPreferenceStockList()
+        val tmp = adapter.interfaceMainActivityForAdapter.getPreferenceStockList()
         if(tmp!=null) {
             adapter.listViewItemList = tmp
             adapter.refreshAllStockList(false)
         }
 
-        //Load Setting
-        var setting = Setting()
-        adapter.setting = setting
+        //Load Setting TODO: 로드
+        this.setting = Setting()
 
         // + / x Btn
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
@@ -116,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             var todo = arrayListOf<Int>()
             var i:Int= 0
             for(i in listview.count-1 downTo 0){
-                val curCheckBox = listview.getChildAt(i).findViewById<CheckBox>(R.id.checkbox)
+                val curCheckBox = listview.getChildAt(i).findViewById<CheckBox>(R.id.stock_checkbox)
                 if(curCheckBox.isChecked){
                     todo.add(i)
                 }
@@ -126,7 +126,7 @@ class MainActivity : AppCompatActivity() {
             for(i in todo){
                 adapter.removeItem(i)
             }
-            adapter.interfaceMainActivity.setPreferenceStockList(adapter.listViewItemList)
+            adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.listViewItemList)
             runOnUiThread{
                 adapter.notifyDataSetChanged()
             }
@@ -156,7 +156,8 @@ class MainActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(item.itemId==R.id.settingItem) {
-            val intent = Intent(this, SettingActivity::class.java)
+            val settingActivity = SettingActivity()
+            val intent = Intent(this, settingActivity::class.java)
             startActivity(intent)
             overridePendingTransition(R.anim.to_left, R.anim.none)
         }

@@ -26,7 +26,7 @@
             android:layout_height="24dp"
             android:button="@null"
             android:background="@drawable/selector_checkbox"
-            android:id="@+id/checkbox"
+            android:id="@+id/stock_checkbox"
             android:layout_gravity="center"
             android:visibility="invisible"
             />
