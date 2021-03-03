@@ -49,6 +49,7 @@ class MainActivity : AppCompatActivity() {
             override fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int) {
                 runOnUiThread{
                     adapter.notifyDataSetChanged()
+                    this.setPreferenceStockList(adapter.listViewItemList)
                 }
             }
             override fun makeToastText(text: String, lengthToast:Int){
@@ -81,9 +82,6 @@ class MainActivity : AppCompatActivity() {
             adapter.listViewItemList = tmp
             adapter.refreshAllStockList(false)
         }
-
-        //Load Setting TODO: 로드
-        this.setting = Setting()
 
         // + / x Btn
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
