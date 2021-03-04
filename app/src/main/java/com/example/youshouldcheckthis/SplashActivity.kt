@@ -15,7 +15,7 @@ class SplashActivity: Activity() {
         handler.postDelayed({
         startActivity(Intent(application, MainActivity::class.java))
             finish()
-        }, 2000)
+        }, 1500)
     }
 
     override fun onBackPressed() {

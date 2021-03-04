@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import java.lang.Exception
 
 class CheckingService : Service() {
-    val channel_name: String = "CHANNEL_1"
+    val channel_name: String = "주식 변동"
     val CHANNEL_ID: String = "MY_CH"
     var notificationId: Int = 1002
 

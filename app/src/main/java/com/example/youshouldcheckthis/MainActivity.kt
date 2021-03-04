@@ -1,10 +1,13 @@
 package com.example.youshouldcheckthis
 
+import android.Manifest
+import android.Manifest.permission.*
 import android.app.NotificationManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -19,7 +22,9 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
+import androidx.core.content.ContextCompat
 import androidx.core.view.iterator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
@@ -37,9 +42,17 @@ class MainActivity : AppCompatActivity() {
     private var mToast:Toast? = null
     private var setting = Setting()
     private lateinit var adapter:ListViewAdapter
+    private val multiplePermissionsCode = 100
+    private val requiredPermissions = arrayOf(
+            Manifest.permission.INTERNET,
+            Manifest.permission.USE_FULL_SCREEN_INTENT,
+            Manifest.permission.FOREGROUND_SERVICE
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        checkPermissionAndRequest()
 
         //Background Service For Alarm!
         startService(Intent(this, CheckingService::class.java))
@@ -195,6 +208,20 @@ class MainActivity : AppCompatActivity() {
             return
         }
         super.onBackPressed()
+    }
+
+    fun checkPermissionAndRequest(){
+        var rejectedPermissionList = ArrayList<String>()
+        for(permission in requiredPermissions){
+            if(ContextCompat.checkSelfPermission(this, permission)!= PackageManager.PERMISSION_GRANTED){
+                rejectedPermissionList.add(permission)
+            }
+        }
+
+        if(rejectedPermissionList.isNotEmpty()){
+            val array = arrayOfNulls<String>(rejectedPermissionList.size)
+            ActivityCompat.requestPermissions(this, rejectedPermissionList.toArray(array), multiplePermissionsCode)
+        }
     }
 
     fun setMessageNoList(){
