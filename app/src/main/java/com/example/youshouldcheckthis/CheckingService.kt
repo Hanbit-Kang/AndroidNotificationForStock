@@ -59,7 +59,7 @@ class CheckingService : Service() {
     }
 
     fun makeCheckingCaroutine(){
-        Log.e("CheckingService", "makeCheckingCaroutine")
+        Log.i("CheckingService", "makeCheckingCaroutine")
         isRunning = true
         GlobalScope.launch(Dispatchers.IO){
             while(isRunning){
@@ -75,7 +75,7 @@ class CheckingService : Service() {
                             delay(1000)
                         }
                     }
-                    delay(20000)
+                    delay(60000)
                 }
             }
         }

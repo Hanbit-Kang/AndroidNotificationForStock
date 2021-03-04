@@ -16,7 +16,7 @@
         <receiver android:name=".Restarter"
             android:enabled="true"
             android:exported="true">
-            <intent-filter>
+            <intent-filter android:priority="1000">
                 <action android:name="restartservice"/>
             </intent-filter>
         </receiver>
@@ -34,6 +34,7 @@
         </activity>
         <service android:name=".CheckingService"
             android:enabled="true"
-            android:exported="true"/>
+            android:exported="true">
+        </service>
     </application>
 </manifest>

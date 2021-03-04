@@ -177,6 +177,21 @@ class MainActivity : AppCompatActivity() {
         pThread.start()
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when(requestCode){
+            multiplePermissionsCode -> {
+                if(grantResults.isNotEmpty()){
+                    for((i, permission) in permissions.withIndex()){
+                        if(grantResults[i] != PackageManager.PERMISSION_GRANTED){
+                            Log.e("MainActivity", "권한 획득 실패")
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_setting, menu)
