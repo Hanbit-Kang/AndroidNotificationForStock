@@ -14,6 +14,30 @@
         >
     </ListView>
 
+    <LinearLayout
+        android:id="@+id/message_no_list_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:gravity="center"
+        >
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/ic_baseline_playlist_add"
+            android:layout_gravity="center"/>
+        <TextView
+            android:layout_marginTop="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="관심 종목을 추가하세요!"
+            android:fontFamily="@font/gugi_regular"
+            android:textColor="#e2e2e2"
+            android:textSize="24dp"
+            android:layout_gravity="center"
+            />
+    </LinearLayout>
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_remove"
         android:layout_width="wrap_content"

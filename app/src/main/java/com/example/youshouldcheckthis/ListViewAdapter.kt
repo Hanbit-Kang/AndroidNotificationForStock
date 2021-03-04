@@ -141,7 +141,7 @@ class ListViewAdapter : BaseAdapter(){
         }
     }
     fun refreshStockList(index: Int, cntTry: Int){
-        if(cntTry in 2..9){
+        if(cntTry==3){
             this.interfaceMainActivityForAdapter.makeToastText("종목을 불러오는 데 실패하여 재시도합니다.", Toast.LENGTH_SHORT)
         }
         else if (cntTry>=10){

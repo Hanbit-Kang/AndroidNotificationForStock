@@ -36,6 +36,7 @@ public interface InterfaceMainActivityForAdapter{
 class MainActivity : AppCompatActivity() {
     private var mToast:Toast? = null
     private var setting = Setting()
+    private lateinit var adapter:ListViewAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
 
         //ListView
         val listview: ListView = findViewById<View>(R.id.stock_list_view) as ListView
-        val adapter = ListViewAdapter()
+        adapter = ListViewAdapter()
         adapter.interfaceMainActivityForAdapter = object: InterfaceMainActivityForAdapter{
             override fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int) {
                 runOnUiThread{
@@ -89,6 +90,9 @@ class MainActivity : AppCompatActivity() {
             adapter.refreshAllStockList(false)
         }
 
+        //종목 없을 때 보이는 메시지 세팅
+        setMessageNoList()
+
         // + / x Btn
         findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
             if(adapter.isRemoveMode){ // x Btn -> Cancel
@@ -106,6 +110,7 @@ class MainActivity : AppCompatActivity() {
                         .setPositiveButton("확인"){ dialog: DialogInterface?, which: Int ->
                             adapter.addItem(dialogText.text.toString())
                             imm.hideSoftInputFromWindow(dialogText.windowToken, 0)
+                            setMessageNoList()
                         }
                         .setCancelable(false)
                         .show()
@@ -134,6 +139,7 @@ class MainActivity : AppCompatActivity() {
             runOnUiThread{
                 adapter.notifyDataSetChanged()
             }
+            setMessageNoList()
         }
 
         //Periodic Refresh
@@ -180,5 +186,23 @@ class MainActivity : AppCompatActivity() {
         broadcastIntent.setClass(this, Restarter::class.java)
         this.sendBroadcast(broadcastIntent)
         super.onDestroy()
+    }
+
+    override fun onBackPressed() {
+        if(adapter.isRemoveMode){
+            adapter.isRemoveMode= false
+            adapter.setCheckBoxInvisible()
+            return
+        }
+        super.onBackPressed()
+    }
+
+    fun setMessageNoList(){
+        val messageNoListLayout = findViewById<LinearLayout>(R.id.message_no_list_layout)
+        if(adapter.count == 0){
+            messageNoListLayout.visibility = View.VISIBLE
+        }else{
+            messageNoListLayout.visibility = View.INVISIBLE
+        }
     }
 }
