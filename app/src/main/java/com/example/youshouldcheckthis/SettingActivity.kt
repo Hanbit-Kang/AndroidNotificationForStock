@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.CheckBox
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -34,6 +35,7 @@ class SettingActivity : AppCompatActivity() {
         //fab Save
         findViewById<FloatingActionButton>(R.id.fab_save).setOnClickListener{
             this.saveAllSettingToPreference()
+            Toast.makeText(this,"설정을 저장하였습니다.", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -67,12 +69,12 @@ class SettingActivity : AppCompatActivity() {
         }
     }
     fun loadAllSettingFromPreference(){
-        getPreferenceSetting("setting_increase_alarm", "CheckBox")
-        getPreferenceSetting("setting_decrease_alarm", "CheckBox")
-        getPreferenceSetting("setting_increase_rate_limit", "EditText")
-        getPreferenceSetting("setting_decrease_rate_limit", "EditText")
+        loadSettingFromPreference("setting_increase_alarm", "CheckBox")
+        loadSettingFromPreference("setting_decrease_alarm", "CheckBox")
+        loadSettingFromPreference("setting_increase_rate_limit", "EditText")
+        loadSettingFromPreference("setting_decrease_rate_limit", "EditText")
     }
-    fun getPreferenceSetting(strId:String, strType: String){
+    fun loadSettingFromPreference(strId:String, strType: String){
         if(strType=="CheckBox"){
             val elem = findViewById<CheckBox>(resources.getIdentifier(strId, "id", packageName))
             val prefStock: SharedPreferences = baseContext.getSharedPreferences("pref_$strId", Context.MODE_PRIVATE)

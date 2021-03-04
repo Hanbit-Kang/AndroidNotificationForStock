@@ -1,9 +1,11 @@
 package com.example.youshouldcheckthis
 
+import android.app.NotificationManager
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -17,6 +19,7 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.NotificationCompat
 import androidx.core.view.iterator
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
@@ -36,6 +39,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //Background Service For Alarm!
+        startService(Intent(this, CheckingService::class.java))
 
         // ActionBar Customize
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
@@ -131,10 +137,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Periodic Refresh
-        Thread(
+        val pThread = Thread( //Error app이 실행된 상태에서 alarm으로 MainActivity 진입 시 Thread 중복
                 Runnable{
                     try{
                         while(true){
+                            //Checking Service에서 리스트를 갱신할 수도 있음
+                            val tmp = adapter.interfaceMainActivityForAdapter.getPreferenceStockList()
+                            if(tmp!=null) {
+                                adapter.listViewItemList = tmp
+                            }
                             adapter.refreshAllStockList(true)
                             Log.i("MainActivity","PeriodicRefreshThread")
                             Thread.sleep(60000)
@@ -143,7 +154,8 @@ class MainActivity : AppCompatActivity() {
                         e.printStackTrace()
                     }
                 }
-        ).start()
+        )
+        pThread.start()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -160,5 +172,13 @@ class MainActivity : AppCompatActivity() {
             overridePendingTransition(R.anim.to_left, R.anim.none)
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onDestroy() {
+        val broadcastIntent = Intent()
+        broadcastIntent.action = "restartservice"
+        broadcastIntent.setClass(this, Restarter::class.java)
+        this.sendBroadcast(broadcastIntent)
+        super.onDestroy()
     }
 }

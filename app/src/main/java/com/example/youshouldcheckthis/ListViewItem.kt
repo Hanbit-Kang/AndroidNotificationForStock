@@ -11,4 +11,5 @@ class ListViewItem {
     var stockPriceFluctuationStr: String? = null
     var stockUpdatedAt: String? = null
     var stockAlarm: Boolean = false
+    var recentAlarmDateStr: String = "0"
 }
