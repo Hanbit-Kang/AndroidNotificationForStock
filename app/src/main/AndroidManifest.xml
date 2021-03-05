@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.youshouldcheckthis">
+    package="com.myex.youshouldcheckthis">
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.USE_FULL_SCREEN_INTENT" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
@@ -14,7 +14,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.YouShouldCheckThis">
 
-        <receiver android:name=".Restarter"
+        <receiver android:name="com.myex.youshouldcheckthis.Restarter"
             android:enabled="true"
             android:exported="false"
             android:permission="android.permission.RECEIVE_BOOT_COMPLETED"
@@ -26,9 +26,9 @@
                 <action android:name="restartservice"/>
             </intent-filter>
         </receiver>
-        <activity android:name=".SettingActivity"
+        <activity android:name="com.myex.youshouldcheckthis.SettingActivity"
             tools:ignore="Instantiatable" />
-        <activity android:name=".SplashActivity"
+        <activity android:name="com.myex.youshouldcheckthis.SplashActivity"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -36,9 +36,9 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity">
+        <activity android:name="com.myex.youshouldcheckthis.MainActivity">
         </activity>
-        <service android:name=".CheckingService"
+        <service android:name="com.myex.youshouldcheckthis.CheckingService"
             android:enabled="true"
             android:exported="true">
         </service>
