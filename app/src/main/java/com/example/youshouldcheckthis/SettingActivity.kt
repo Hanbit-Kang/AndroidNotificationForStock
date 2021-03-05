@@ -48,10 +48,7 @@ class SettingActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        val broadcastIntent = Intent()
-        broadcastIntent.action = "restartservice"
-        broadcastIntent.setClass(this, Restarter::class.java)
-        this.sendBroadcast(broadcastIntent)
+        //TODO: manage
         super.onDestroy()
     }
 

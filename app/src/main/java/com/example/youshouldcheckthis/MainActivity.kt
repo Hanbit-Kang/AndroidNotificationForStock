@@ -26,10 +26,12 @@ import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.iterator
+import androidx.work.*
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
 import com.google.gson.internal.GsonBuildConfig
 import com.google.gson.reflect.TypeToken
+import java.util.concurrent.TimeUnit
 
 public interface InterfaceMainActivityForAdapter{
     fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int)
@@ -46,17 +48,15 @@ class MainActivity : AppCompatActivity() {
     private val requiredPermissions = arrayOf(
             Manifest.permission.INTERNET,
             Manifest.permission.USE_FULL_SCREEN_INTENT,
-            Manifest.permission.FOREGROUND_SERVICE,
-            Manifest.permission.RECEIVE_BOOT_COMPLETED
+            Manifest.permission.RECEIVE_BOOT_COMPLETED,
+            Manifest.permission.WAKE_LOCK,
+            Manifest.permission.ACCESS_NETWORK_STATE
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
         checkPermissionAndRequest()
-
-        //Background Service For Alarm!
-        startService(Intent(this, CheckingService::class.java))
+        enqueuePeriodicCheckWorker()
 
         // ActionBar Customize
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
@@ -209,14 +209,6 @@ class MainActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    override fun onDestroy() {
-        val broadcastIntent = Intent()
-        broadcastIntent.action = "restartservice"
-        broadcastIntent.setClass(this, Restarter::class.java)
-        this.sendBroadcast(broadcastIntent)
-        super.onDestroy()
-    }
-
     override fun onBackPressed() {
         if(adapter.isRemoveMode){
             adapter.isRemoveMode= false
@@ -247,5 +239,16 @@ class MainActivity : AppCompatActivity() {
         }else{
             messageNoListLayout.visibility = View.INVISIBLE
         }
+    }
+
+    fun enqueuePeriodicCheckWorker(){
+        val checkWorkerBuilder = PeriodicWorkRequest.Builder(CheckWorker::class.java, 16, TimeUnit.MINUTES)
+                .setConstraints(Constraints.Builder()
+                        .build()
+                )
+        val periodicWorkRequest = checkWorkerBuilder.addTag("CheckWorker")
+                .build()
+        WorkManager.getInstance(applicationContext).enqueueUniquePeriodicWork("CheckWorker", ExistingPeriodicWorkPolicy.REPLACE, periodicWorkRequest)
+        Log.e("MainActivity", "Enqueued Worker")
     }
 }
