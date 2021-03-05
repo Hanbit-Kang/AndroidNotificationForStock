@@ -47,6 +47,14 @@ class SettingActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
+    override fun onDestroy() {
+        val broadcastIntent = Intent()
+        broadcastIntent.action = "restartservice"
+        broadcastIntent.setClass(this, Restarter::class.java)
+        this.sendBroadcast(broadcastIntent)
+        super.onDestroy()
+    }
+
     override fun onBackPressed() {
         super.onBackPressed()
         overridePendingTransition(R.anim.none, R.anim.to_right)

@@ -41,10 +41,10 @@ class CheckingService : Service() {
                     .setContentText("").build()
             startForeground(1, notification)
         }
-        makeCheckingCaroutine()
     }
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         this.stopSelf() //만약 이미 실행한 서비스가 있다면 stop
+        makeCheckingCaroutine()
         return START_STICKY
     }
     override fun onBind(intent: Intent): IBinder? {
