@@ -75,7 +75,7 @@ class CheckingService : Service() {
                             delay(1000)
                         }
                     }
-                    delay(10000)
+                    delay(60000)
                 }
             }
         }
@@ -117,8 +117,7 @@ class CheckingService : Service() {
                         val indexDate = updatedAtDataText.indexOf("일") //한국 아닌 곳에서 구글 실행 시 Date 포맷이 다름!!오류
                         val dateString = updatedAtDataText.substring(0, indexDate)
 
-                        //TODO: true 없애기 dateString!=listViewItemList!![index].recentAlarmDateStr
-                        if(true||dateString!=listViewItemList!![index].recentAlarmDateStr){ //최근 알람 울린 게 오늘이면 안 됨
+                        if(dateString!=listViewItemList!![index].recentAlarmDateStr){ //최근 알람 울린 게 오늘이면 안 됨
                             val priceFluctuationData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(2) > span:nth-child(1)").last()
                             val rateData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2)> div:nth-child(1) > span:nth-child(2) > span:nth-child(2) > span:nth-child(1)").last()
 
