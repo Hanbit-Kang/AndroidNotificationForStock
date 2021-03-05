@@ -164,7 +164,7 @@ class CheckingService : Service() {
     }
     fun createNotificationChannel(builder: NotificationCompat.Builder, notificationId: Int){
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
-            val descriptionText = "1번 채널입니다."
+            val descriptionText = "지정한 조건에 만족하였을 때 발생시키는 알람입니다."
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, channel_name, importance).apply{
                 description = descriptionText
