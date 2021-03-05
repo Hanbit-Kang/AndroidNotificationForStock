@@ -46,7 +46,8 @@ class MainActivity : AppCompatActivity() {
     private val requiredPermissions = arrayOf(
             Manifest.permission.INTERNET,
             Manifest.permission.USE_FULL_SCREEN_INTENT,
-            Manifest.permission.FOREGROUND_SERVICE
+            Manifest.permission.FOREGROUND_SERVICE,
+            Manifest.permission.RECEIVE_BOOT_COMPLETED
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
