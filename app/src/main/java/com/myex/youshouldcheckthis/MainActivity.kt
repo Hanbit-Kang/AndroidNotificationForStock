@@ -31,7 +31,7 @@ public interface InterfaceMainActivityForAdapter{
 
 class MainActivity : AppCompatActivity() {
     private var mToast:Toast? = null
-    private var setting = Setting()
+    private var isPThreadRunning = true
     private lateinit var adapter:ListViewAdapter
     private val multiplePermissionsCode = 100
     private val requiredPermissions = arrayOf(
@@ -148,10 +148,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Periodic Refresh
+        isPThreadRunning = true
         val pThread = Thread( //Error app이 실행된 상태에서 alarm으로 MainActivity 진입 시 Thread 중복
                 Runnable{
                     try{
-                        while(true){
+                        while(isPThreadRunning){
                             //Checking Service에서 리스트를 갱신할 수도 있음
                             val tmp = adapter.interfaceMainActivityForAdapter.getPreferenceStockList()
                             if(tmp!=null) {
@@ -166,7 +167,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
         )
-        pThread.start()
+        pThread?.start()
     }
 
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
@@ -201,6 +202,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
+        isPThreadRunning = false
         val broadcastIntent = Intent()
         broadcastIntent.action = "restartservice"
         broadcastIntent.setClass(this, Restarter::class.java)
