@@ -75,6 +75,7 @@ class CheckingService : Service() {
                     }
                     delay(60000)
                 }
+                delay(10000) //if there is no item
             }
         }
     }
