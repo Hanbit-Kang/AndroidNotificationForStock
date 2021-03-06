@@ -31,6 +31,7 @@ class CheckingService : Service() {
         super.onCreate()
         if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.O){
             val channel = NotificationChannel(CHANNEL_ID, channel_name, NotificationManager.IMPORTANCE_LOW)
+            channel.setShowBadge(false)
             val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
             val notification = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -165,10 +166,11 @@ class CheckingService : Service() {
             val importance = NotificationManager.IMPORTANCE_DEFAULT
             val channel = NotificationChannel(CHANNEL_ID, channel_name, importance).apply{
                 description = descriptionText
+                setShowBadge(false)
+                lightColor = Color.BLUE
+                enableVibration(true)
             }
 
-            channel.lightColor = Color.BLUE
-            channel.enableVibration(true)
             val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(channel)
             notificationManager.notify(notificationId, builder.build())

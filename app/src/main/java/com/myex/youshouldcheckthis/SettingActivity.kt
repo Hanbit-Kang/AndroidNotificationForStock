@@ -14,6 +14,12 @@ import androidx.appcompat.app.AppCompatActivity
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 class SettingActivity : AppCompatActivity() {
+    val settingTypeForId:HashMap<String, String> = hashMapOf(
+            "setting_increase_alarm" to "CheckBox",
+            "setting_decrease_alarm" to "CheckBox",
+            "setting_increase_rate_limit" to "EditText",
+            "setting_decrease_rate_limit" to "EditText"
+    )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_setting)
@@ -29,8 +35,12 @@ class SettingActivity : AppCompatActivity() {
 
         //fab Save
         findViewById<FloatingActionButton>(R.id.fab_save).setOnClickListener{
-            this.saveAllSettingToPreference()
-            Toast.makeText(this,"설정을 저장하였습니다.", Toast.LENGTH_SHORT).show()
+            if(isVaildSetting()){
+                this.saveAllSettingToPreference()
+                Toast.makeText(this,"설정을 저장하였습니다.", Toast.LENGTH_SHORT).show()
+            }else{
+                Toast.makeText(this,"알람 발생 조건이 비어있거나, 잘못된 형태입니다.", Toast.LENGTH_SHORT).show()
+            }
         }
     }
 
@@ -54,11 +64,22 @@ class SettingActivity : AppCompatActivity() {
         super.onBackPressed()
         overridePendingTransition(R.anim.none, R.anim.to_right)
     }
+
+    fun isVaildSetting():Boolean{
+        try{
+            if(!findViewById<EditText>(R.id.setting_increase_rate_limit).text.toString().toFloat().isNaN()
+                    &&!findViewById<EditText>(R.id.setting_decrease_rate_limit).text.toString().toFloat().isNaN()){
+                return true
+            }
+        }catch(e:Exception){//toFloat() Format err
+            return false
+        }
+        return false
+    }
     fun saveAllSettingToPreference(){
-        setPreferenceSetting("setting_increase_alarm", "CheckBox")
-        setPreferenceSetting("setting_decrease_alarm", "CheckBox")
-        setPreferenceSetting("setting_increase_rate_limit", "EditText")
-        setPreferenceSetting("setting_decrease_rate_limit", "EditText")
+        for((k, v) in settingTypeForId){
+            setPreferenceSetting(k, v)
+        }
     }
     fun setPreferenceSetting(strId:String, strType: String){
         if(strType=="CheckBox"){
@@ -72,10 +93,9 @@ class SettingActivity : AppCompatActivity() {
         }
     }
     fun loadAllSettingFromPreference(){
-        loadSettingFromPreference("setting_increase_alarm", "CheckBox")
-        loadSettingFromPreference("setting_decrease_alarm", "CheckBox")
-        loadSettingFromPreference("setting_increase_rate_limit", "EditText")
-        loadSettingFromPreference("setting_decrease_rate_limit", "EditText")
+        for((k, v) in settingTypeForId){
+            loadSettingFromPreference(k, v)
+        }
     }
     fun loadSettingFromPreference(strId:String, strType: String){
         if(strType=="CheckBox"){
