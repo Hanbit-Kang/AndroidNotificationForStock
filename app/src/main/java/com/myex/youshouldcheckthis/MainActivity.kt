@@ -47,9 +47,7 @@ class MainActivity : AppCompatActivity() {
         checkPermissionAndRequest()
 
         //Background Service For Alarm!
-        if(adapter.count>=1) {
-            startService(Intent(this, CheckingService::class.java))
-        }
+        startService(Intent(this, CheckingService::class.java))
 
         // ActionBar Customize
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
@@ -204,13 +202,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onDestroy() {
-        if(adapter.count>=1){
-            isPThreadRunning = false
-            val broadcastIntent = Intent()
-            broadcastIntent.action = "restartservice"
-            broadcastIntent.setClass(this, Restarter::class.java)
-            this.sendBroadcast(broadcastIntent)
-        }
+        isPThreadRunning = false
+        val broadcastIntent = Intent()
+        broadcastIntent.action = "restartservice"
+        broadcastIntent.setClass(this, Restarter::class.java)
+        this.sendBroadcast(broadcastIntent)
         super.onDestroy()
     }
 

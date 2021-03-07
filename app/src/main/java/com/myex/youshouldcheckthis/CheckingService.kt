@@ -11,12 +11,10 @@ import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import java.lang.Exception
+import java.lang.Runnable
 
 class CheckingService : Service() {
     val channel_name: String = "주식 변동"
@@ -64,7 +62,7 @@ class CheckingService : Service() {
                 Log.i("CheckingService","PeriodicRefreshCaroutine")
                 loadAllSettingFromPreference()
                 val tmp = getPreferenceStockList()
-                if(tmp!=null&&((setting.decreaseAlarm == true &&setting.decreaseRateLimit?.isNaN()==false)||(setting.increaseAlarm == true &&setting.increaseRateLimit?.isNaN()==false))){
+                if(tmp!=null&&((setting.decreaseAlarm == true &&setting.decreaseRateLimit?.isNaN()==false)||(setting.increaseAlarm == true &&setting.increaseRateLimit?.isNaN()==false))&&(listViewItemList!!.size>=1)){
                     listViewItemList = tmp!!
                     var i:Int? = null
                     for(i in 0 until listViewItemList!!.size){
@@ -74,8 +72,9 @@ class CheckingService : Service() {
                         }
                     }
                     delay(6*60000)
+                }else{
+                    killCheckingCaroutine()
                 }
-                delay(10000) //if there is no item
             }
         }
     }
