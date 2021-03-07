@@ -62,7 +62,7 @@ class CheckingService : Service() {
                 Log.i("CheckingService","PeriodicRefreshCaroutine")
                 loadAllSettingFromPreference()
                 val tmp = getPreferenceStockList()
-                if(tmp!=null&&((setting.decreaseAlarm == true &&setting.decreaseRateLimit?.isNaN()==false)||(setting.increaseAlarm == true &&setting.increaseRateLimit?.isNaN()==false))&&(listViewItemList!!.size>=1)){
+                if(tmp!=null&&((setting.decreaseAlarm == true &&setting.decreaseRateLimit?.isNaN()==false)||(setting.increaseAlarm == true &&setting.increaseRateLimit?.isNaN()==false))&&(tmp.size>=1)){
                     listViewItemList = tmp!!
                     var i:Int? = null
                     for(i in 0 until listViewItemList!!.size){
