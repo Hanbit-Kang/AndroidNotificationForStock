@@ -18,6 +18,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -99,7 +100,8 @@ class MainActivity : AppCompatActivity() {
         setMessageNoList()
 
         // + / x Btn
-        findViewById<FloatingActionButton>(R.id.fab_add).setOnClickListener {
+        val fabAdd = findViewById<FloatingActionButton>(R.id.fab_add)
+        fabAdd.setOnClickListener {
             if(adapter.isRemoveMode){ // x Btn -> Cancel
                 adapter.isRemoveMode= false
                 adapter.setCheckBoxInvisible()
@@ -124,6 +126,13 @@ class MainActivity : AppCompatActivity() {
                 }, 200L)
             }
         }
+        fabAdd.setOnLongClickListener(View.OnLongClickListener {
+            fabAdd.visibility = View.INVISIBLE
+            Handler(Looper.getMainLooper()).postDelayed({
+                fabAdd.visibility = View.VISIBLE
+            }, 3000L)
+            true
+        })
 
         //Remove Btn
         findViewById<FloatingActionButton>(R.id.fab_remove).setOnClickListener {
