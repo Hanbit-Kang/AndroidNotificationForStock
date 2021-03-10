@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.widget.CheckBox
 import android.widget.EditText
@@ -18,7 +19,9 @@ class SettingActivity : AppCompatActivity() {
             "setting_increase_alarm" to "CheckBox",
             "setting_decrease_alarm" to "CheckBox",
             "setting_increase_rate_limit" to "EditText",
-            "setting_decrease_rate_limit" to "EditText"
+            "setting_decrease_rate_limit" to "EditText",
+            "setting_repeat_hour" to "EditText",
+            "setting_repeat_minute" to "EditText"
     )
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +71,9 @@ class SettingActivity : AppCompatActivity() {
     fun isVaildSetting():Boolean{
         try{
             if(!findViewById<EditText>(R.id.setting_increase_rate_limit).text.toString().toFloat().isNaN()
-                    &&!findViewById<EditText>(R.id.setting_decrease_rate_limit).text.toString().toFloat().isNaN()){
+                    &&!findViewById<EditText>(R.id.setting_decrease_rate_limit).text.toString().toFloat().isNaN()
+                    &&findViewById<EditText>(R.id.setting_repeat_hour).text.isNotEmpty()
+                    &&findViewById<EditText>(R.id.setting_repeat_minute).text.isNotEmpty()){
                 return true
             }
         }catch(e:Exception){//toFloat() Format err
@@ -105,7 +110,12 @@ class SettingActivity : AppCompatActivity() {
         }else if(strType=="EditText"){
             val elem = findViewById<EditText>(resources.getIdentifier(strId, "id", packageName))
             val prefStock: SharedPreferences = baseContext.getSharedPreferences("pref_$strId", Context.MODE_PRIVATE)
-            elem.setText(prefStock.getString("pref_$strId", null))
+            val toInsertedText = prefStock.getString("pref_$strId", null)
+            if(toInsertedText!=null){
+                elem.setText(toInsertedText)
+            }else{ //Default값으로 저장
+                setPreferenceSetting(strId, strType)
+            }
         }
     }
 }
