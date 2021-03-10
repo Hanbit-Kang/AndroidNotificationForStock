@@ -15,6 +15,8 @@ import kotlinx.coroutines.*
 import org.jsoup.Jsoup
 import java.lang.Exception
 import java.lang.Runnable
+import java.util.*
+import kotlin.collections.ArrayList
 
 class CheckingService : Service() {
     val channel_name: String = "주식 변동"
@@ -71,7 +73,7 @@ class CheckingService : Service() {
                             delay(1000)
                         }
                     }
-                    delay(6*60000)
+                    delay(6*60000)//TODO
                 }else{
                     killCheckingCaroutine()
                 }
@@ -87,6 +89,8 @@ class CheckingService : Service() {
         this.setting.decreaseAlarm = getPreferenceSetting("setting_decrease_alarm", "CheckBox").toBoolean()
         this.setting.increaseRateLimit = getPreferenceSetting("setting_increase_rate_limit", "EditText")?.toFloat()
         this.setting.decreaseRateLimit = getPreferenceSetting("setting_decrease_rate_limit", "EditText")?.toFloat()
+        this.setting.repeatHour = getPreferenceSetting("setting_repeat_hour", "EditText")?.toInt()
+        this.setting.repeatMinute = getPreferenceSetting("setting_repeat_minute", "EditText")?.toInt()
     }
     fun getPreferenceSetting(strId:String, strType: String):String?{
         val prefStock: SharedPreferences = baseContext.getSharedPreferences("pref_$strId", Context.MODE_PRIVATE)
@@ -99,6 +103,7 @@ class CheckingService : Service() {
         val type = object: TypeToken<ArrayList<ListViewItem>>(){}.type
         return gson.fromJson(json, type)
     }
+
     fun refreshStockListOnBackground(index: Int, cntTry: Int){
         if(cntTry>=10){
             return
@@ -111,23 +116,20 @@ class CheckingService : Service() {
                                 .timeout(1500)
                                 .get()
 
-                        val updatedAtDataText = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > div:nth-child(3) > span:nth-child(1) > span:nth-child(2)").last().text()
-                        val indexDate = updatedAtDataText.indexOf("일") //한국 아닌 곳에서 구글 실행 시 Date 포맷이 다름!!오류
-                        val dateString = updatedAtDataText.substring(0, indexDate)
-
-                        if(dateString!=listViewItemList!![index].recentAlarmDateStr){ //최근 알람 울린 게 오늘이면 안 됨
+                        val timeNow = Date(System.currentTimeMillis())
+                        if(listViewItemList!![index].recentAlarmDateTime==null||isAvailableStock(timeNow, listViewItemList!![index].recentAlarmDateTime!!)){ //연산 함수 만들기
                             val priceFluctuationData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(2) > span:nth-child(1)").last()
                             val rateData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2)> div:nth-child(1) > span:nth-child(2) > span:nth-child(2) > span:nth-child(1)").last()
 
                             if(this.setting.increaseAlarm==true&&priceFluctuationData.text()[0]=='+'){
                                 if(rateData.text().substring(1, rateData.text().length-2).toFloat()>this.setting.increaseRateLimit!!){
-                                    listViewItemList!![index].recentAlarmDateStr = dateString
+                                    listViewItemList!![index].recentAlarmDateTime = timeNow
                                     this.setPreferenceStockList(listViewItemList!!)
                                     this.createStockNotification("종목 알림", "["+listViewItemList!![index].stockNameStr+"] 종목 "+priceFluctuationData.text()[0]+rateData.text().substring(1, rateData.text().length-1)+" 변동")
                                 }
                             }else if(this.setting.decreaseAlarm==true&&priceFluctuationData.text()[0]=='−'){
                                 if(rateData.text().substring(1, rateData.text().length-2).toFloat()>this.setting.decreaseRateLimit!!){
-                                    listViewItemList!![index].recentAlarmDateStr = dateString
+                                    listViewItemList!![index].recentAlarmDateTime = timeNow
                                     this.setPreferenceStockList(listViewItemList!!)
                                     this.createStockNotification("종목 알림", "["+listViewItemList!![index].stockNameStr+"] 종목 "+priceFluctuationData.text()[0]+rateData.text().substring(1, rateData.text().length-1)+" 변동")
                                 }
@@ -178,5 +180,15 @@ class CheckingService : Service() {
             val notificationManager: NotificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(notificationId, builder.build())
         }
+    }
+
+    fun isAvailableStock(timeNow:Date, recentAlarmDateTime: Date):Boolean{
+        val calendar = Calendar.getInstance()
+        calendar.time = recentAlarmDateTime
+        setting.repeatHour?.let { calendar.add(Calendar.HOUR, it) }
+        setting.repeatMinute?.let { calendar.add(Calendar.MINUTE, it) }
+        val combinedTime:Date = calendar.time
+
+        return combinedTime.before(timeNow)
     }
 }

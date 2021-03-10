@@ -1,5 +1,7 @@
 package com.myex.youshouldcheckthis
 
+import java.util.*
+
 class ListViewItem {
     var stockNameStr: String? = null
     var stockPriceStr: String? = null
@@ -8,5 +10,5 @@ class ListViewItem {
     var stockPriceFluctuationStr: String? = null
     var stockUpdatedAt: String? = null
     var stockAlarm: Boolean = false
-    var recentAlarmDateStr: String = "0"
+    var recentAlarmDateTime: Date? = null
 }
