@@ -18,8 +18,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.core.view.size
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
@@ -43,6 +43,9 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.FOREGROUND_SERVICE,
             Manifest.permission.RECEIVE_BOOT_COMPLETED
     )
+
+    private lateinit var listViewItemList:ArrayList<ListViewItem>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -59,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         //ListView
         val recyclerView: androidx.recyclerview.widget.RecyclerView = findViewById<View>(R.id.stock_recycler_view) as androidx.recyclerview.widget.RecyclerView
-        var listViewItemList = ArrayList<ListViewItem>()
+        listViewItemList = ArrayList<ListViewItem>()
         adapter = CustomAdapter(listViewItemList)
         adapter.interfaceMainActivityForAdapter = object: InterfaceMainActivityForAdapter{
             override fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int) {
@@ -105,57 +108,29 @@ class MainActivity : AppCompatActivity() {
         // + / x Btn
         val fabAdd = findViewById<FloatingActionButton>(R.id.fab_add)
         fabAdd.setOnClickListener {
-            if(adapter.isRemoveMode){ // x Btn -> Cancel
-                adapter.setRemoveModeOff()
-            }else{ // + Btn -> Add
-                val builder = AlertDialog.Builder(this)
-                val dialogView = layoutInflater.inflate(R.layout.custom_dialog, null)
-                val dialogText = dialogView.findViewById<EditText>(R.id.dialogEditText)
-                val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-                builder.setView(dialogView)
-                        .setNegativeButton("취소") {dialog: DialogInterface?, which: Int ->
-                            imm.hideSoftInputFromWindow(dialogText.windowToken, 0)
-                        }
-                        .setPositiveButton("확인"){ dialog: DialogInterface?, which: Int ->
-                            adapter.addItem(dialogText.text.toString())
-                            imm.hideSoftInputFromWindow(dialogText.windowToken, 0)
-                            setMessageNoList()
-                        }
-                        .setCancelable(false)
-                        .show()
-                Handler(Looper.getMainLooper()).postDelayed({
-                    imm.showSoftInput(dialogText, InputMethodManager.SHOW_FORCED)
-                }, 200L)
-            }
-        }
-        fabAdd.setOnLongClickListener(View.OnLongClickListener {
-            fabAdd.visibility = View.INVISIBLE
-            Handler(Looper.getMainLooper()).postDelayed({
-                fabAdd.visibility = View.VISIBLE
-            }, 3000L)
-            true
-        })
-
-        //Remove Btn
-        findViewById<FloatingActionButton>(R.id.fab_remove).setOnClickListener {
-            var todo = arrayListOf<Int>()
-            var i:Int= 0
-            for(i in recyclerView.size-1 downTo 0){
-                val curCheckBox = recyclerView.getChildAt(i).findViewById<CheckBox>(R.id.stock_checkbox)
-                if(curCheckBox.isChecked){
-                    todo.add(i)
+            val builder = AlertDialog.Builder(this)
+            val dialogView = layoutInflater.inflate(R.layout.custom_dialog, null)
+            val dialogText = dialogView.findViewById<EditText>(R.id.dialogEditText)
+            val imm = this.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            builder.setView(dialogView)
+                .setNegativeButton("취소") {dialog: DialogInterface?, which: Int ->
+                    imm.hideSoftInputFromWindow(dialogText.windowToken, 0)
                 }
-            }
-            adapter.setRemoveModeOff()
-            for(i in todo){
-                adapter.removeItem(i)
-            }
-            adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.dataSet)
-            runOnUiThread{
-                adapter.notifyDataSetChanged()
-            }
-            setMessageNoList()
+                .setPositiveButton("확인"){ dialog: DialogInterface?, which: Int ->
+                    adapter.addItem(dialogText.text.toString())
+                    imm.hideSoftInputFromWindow(dialogText.windowToken, 0)
+                    setMessageNoList()
+                }
+                .setCancelable(false)
+                .show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                imm.showSoftInput(dialogText, InputMethodManager.SHOW_FORCED)
+            }, 200L)
         }
+
+        //Swipe To Remove
+        val itemTouchHelper = ItemTouchHelper(this.mIth)
+        itemTouchHelper.attachToRecyclerView(recyclerView)
 
         //Periodic Refresh
         isPThreadRunning = true
@@ -220,14 +195,6 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
-    override fun onBackPressed() {
-        if(adapter.isRemoveMode){
-            adapter.setRemoveModeOff()
-            return
-        }
-        super.onBackPressed()
-    }
-
     fun checkPermissionAndRequest(){
         var rejectedPermissionList = ArrayList<String>()
         for(permission in requiredPermissions){
@@ -250,4 +217,29 @@ class MainActivity : AppCompatActivity() {
             messageNoListLayout.visibility = View.INVISIBLE
         }
     }
+
+    val mIth: ItemTouchHelper.SimpleCallback =
+        object : ItemTouchHelper.SimpleCallback(
+            ItemTouchHelper.UP or ItemTouchHelper.DOWN,
+            ItemTouchHelper.LEFT
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ): Boolean {
+                return true
+            }
+
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+
+                adapter.removeItem(position)
+                adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.dataSet)
+                runOnUiThread{
+                    adapter.notifyDataSetChanged()
+                }
+                setMessageNoList()
+            }
+        }
 }

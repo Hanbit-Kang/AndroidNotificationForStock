@@ -20,7 +20,6 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
 
 class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.Adapter<CustomAdapter.ViewHolder>() {
-    public var isRemoveMode = false
     private lateinit var viewGroupParent: ViewGroup
     public lateinit var rootView: View
     public lateinit var interfaceMainActivityForAdapter:InterfaceMainActivityForAdapter
@@ -82,28 +81,6 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
         }else{
             btnStockAlarmView.background = itemView.context.resources.getDrawable(R.drawable.ic_baseline_alarm_off)
         }
-
-        //제거 모드 ON/OFF에 따라서 체크박스 설정
-        if(isRemoveMode) setCheckBoxVisible(itemView)
-        else setCheckBoxInvisible(itemView)
-
-        //제거 모드
-        val recyclerviewItem = itemView.findViewById<LinearLayout>(R.id.recyclerview_item)
-        recyclerviewItem.setOnLongClickListener(View.OnLongClickListener {
-            this.setRemoveModeOn()
-            val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
-            checkbox.isChecked = true
-            true
-        })
-
-        //제거 모드에서 아이템 클릭 시 체크
-        recyclerviewItem.setOnClickListener(View.OnClickListener { 
-            val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
-            if(checkbox.visibility==View.VISIBLE){
-                checkbox.isChecked = checkbox.isChecked==false
-            }
-            true
-        })
         
         //알림 온오프
         btnStockAlarmView.setOnClickListener(View.OnClickListener {
@@ -112,13 +89,6 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
             this.interfaceMainActivityForAdapter.setPreferenceStockList(dataSet)
             true
         })
-
-        //마지막 인덱스 밑에 여백 추가
-        if(position==dataSet.lastIndex){
-            var params = holder.itemView.layoutParams as RecyclerView.LayoutParams
-            params.bottomMargin = 150
-            holder.itemView.layoutParams = params
-        }
     }
 
     override fun getItemCount(): Int {
@@ -184,106 +154,5 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
             }
         )
         rThread.start()
-    }
-
-    fun setRemoveModeOn(){
-        this.isRemoveMode = true
-
-        var i: Int
-        for(i in 0 until this.viewGroupParent.childCount){
-            setCheckBoxVisible(this.viewGroupParent.getChildAt(i))
-        }
-
-        var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
-        fabRemove.visibility = View.VISIBLE
-        val animationTranslateUp: TranslateAnimation = TranslateAnimation(
-            0f,
-            0f,
-            dpToPx(viewGroupParent.context, 64f).toFloat(),
-            0f
-        )
-        animationTranslateUp.duration = 200
-        animationTranslateUp.fillAfter = true
-        fabRemove.startAnimation(animationTranslateUp)
-
-        var fabAdd = this.rootView.findViewById<FloatingActionButton>(R.id.fab_add)
-        val animationRotate45Degree: RotateAnimation = RotateAnimation(
-            0f,
-            45f,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
-        )
-        animationRotate45Degree.duration = 200
-        animationRotate45Degree.fillAfter = true
-        fabAdd.startAnimation(animationRotate45Degree)
-    }
-
-    fun setRemoveModeOff(){
-        this.isRemoveMode = false
-
-        var i: Int
-        for(i in 0 until this.viewGroupParent.childCount){
-            setCheckBoxInvisible(this.viewGroupParent.getChildAt(i))
-        }
-
-        var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
-        val animationTranslateDown:TranslateAnimation = TranslateAnimation(
-            0f,
-            0f,
-            0f,
-            dpToPx(viewGroupParent.context, 64f).toFloat()
-        )
-        animationTranslateDown.duration = 200
-        animationTranslateDown.fillAfter = true
-        fabRemove.startAnimation(animationTranslateDown)
-        Handler(Looper.getMainLooper()).postDelayed({
-            fabRemove.visibility = View.INVISIBLE
-        }, 250L)
-
-        var fabAdd = this.rootView.findViewById<FloatingActionButton>(R.id.fab_add)
-        val animationRotate45Degree: RotateAnimation = RotateAnimation(
-            45f,
-            0f,
-            Animation.RELATIVE_TO_SELF, 0.5f,
-            Animation.RELATIVE_TO_SELF, 0.5f
-        )
-        animationRotate45Degree.duration = 200
-        animationRotate45Degree.fillAfter = true
-        fabAdd.startAnimation(animationRotate45Degree)
-    }
-
-    fun setCheckBoxVisible(itemView: View){
-        val checkboxLayout = itemView.findViewById<LinearLayout>(R.id.checkbox_layout)
-        val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
-        var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
-
-        checkbox.visibility = View.VISIBLE
-        params.weight = 1f
-        checkboxLayout.layoutParams = params
-
-        val stockLayout = itemView.findViewById<LinearLayout>(R.id.stock_layout)
-        params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
-        params.weight = 5f
-        stockLayout.layoutParams = params
-    }
-
-    fun setCheckBoxInvisible(itemView: View){
-        val checkboxLayout = itemView.findViewById<LinearLayout>(R.id.checkbox_layout)
-        val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
-        var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
-
-        checkbox.visibility = View.INVISIBLE
-        checkbox.isChecked = false
-        params.weight = 0f
-        checkboxLayout.layoutParams = params
-
-        val stockLayout = itemView.findViewById<LinearLayout>(R.id.stock_layout)
-        params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
-        params.weight = 6f
-        stockLayout.layoutParams = params
-    }
-
-    fun dpToPx(context: Context, dp: Float): Float {
-        return TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, dp, context.resources.displayMetrics)
     }
 }
