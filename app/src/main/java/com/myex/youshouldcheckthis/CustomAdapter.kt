@@ -14,6 +14,7 @@ import android.view.animation.Animation
 import android.view.animation.RotateAnimation
 import android.view.animation.TranslateAnimation
 import android.widget.*
+import androidx.core.view.marginBottom
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import org.jsoup.Jsoup
@@ -82,17 +83,20 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
             btnStockAlarmView.background = itemView.context.resources.getDrawable(R.drawable.ic_baseline_alarm_off)
         }
 
-        //편집 모드
+        //제거 모드 ON/OFF에 따라서 체크박스 설정
+        if(isRemoveMode) setCheckBoxVisible(itemView)
+        else setCheckBoxInvisible(itemView)
+
+        //제거 모드
         val recyclerviewItem = itemView.findViewById<LinearLayout>(R.id.recyclerview_item)
         recyclerviewItem.setOnLongClickListener(View.OnLongClickListener {
-            this.setCheckBoxVisible()
-            this.isRemoveMode = true
+            this.setRemoveModeOn()
             val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
             checkbox.isChecked = true
             true
         })
 
-        //편집 모드에서 아이템 클릭 시 체크
+        //제거 모드에서 아이템 클릭 시 체크
         recyclerviewItem.setOnClickListener(View.OnClickListener { 
             val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
             if(checkbox.visibility==View.VISIBLE){
@@ -108,6 +112,13 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
             this.interfaceMainActivityForAdapter.setPreferenceStockList(dataSet)
             true
         })
+
+        //마지막 인덱스 밑에 여백 추가
+        if(position==dataSet.lastIndex){
+            var params = holder.itemView.layoutParams as RecyclerView.LayoutParams
+            params.bottomMargin = 150
+            holder.itemView.layoutParams = params
+        }
     }
 
     override fun getItemCount(): Int {
@@ -175,21 +186,12 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
         rThread.start()
     }
 
-    fun setCheckBoxVisible(){
-        var i:Int= 0
-        for(i in 0 until this.itemCount){
-            val curView:View = this.viewGroupParent.getChildAt(i)
-            val checkboxLayout = curView.findViewById<LinearLayout>(R.id.checkbox_layout)
-            val checkbox = curView.findViewById<CheckBox>(R.id.stock_checkbox)
-            checkbox.visibility = View.VISIBLE
-            var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
-            params.weight = 1f
-            checkboxLayout.layoutParams = params
+    fun setRemoveModeOn(){
+        this.isRemoveMode = true
 
-            val stockLayout = curView.findViewById<LinearLayout>(R.id.stock_layout)
-            params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
-            params.weight = 5f
-            stockLayout.layoutParams = params
+        var i: Int
+        for(i in 0 until this.viewGroupParent.childCount){
+            setCheckBoxVisible(this.viewGroupParent.getChildAt(i))
         }
 
         var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
@@ -216,22 +218,12 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
         fabAdd.startAnimation(animationRotate45Degree)
     }
 
-    fun setCheckBoxInvisible(){
-        var i:Int= 0
-        for(i in 0 until this.itemCount){
-            val curView:View = this.viewGroupParent.getChildAt(i)
-            val checkboxLayout = curView.findViewById<LinearLayout>(R.id.checkbox_layout)
-            val checkbox = curView.findViewById<CheckBox>(R.id.stock_checkbox)
-            checkbox.visibility = View.INVISIBLE
-            checkbox.isChecked = false
-            var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
-            params.weight = 0f
-            checkboxLayout.layoutParams = params
+    fun setRemoveModeOff(){
+        this.isRemoveMode = false
 
-            val stockLayout = curView.findViewById<LinearLayout>(R.id.stock_layout)
-            params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
-            params.weight = 6f
-            stockLayout.layoutParams = params
+        var i: Int
+        for(i in 0 until this.viewGroupParent.childCount){
+            setCheckBoxInvisible(this.viewGroupParent.getChildAt(i))
         }
 
         var fabRemove = this.rootView.findViewById<FloatingActionButton>(R.id.fab_remove)
@@ -258,6 +250,37 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
         animationRotate45Degree.duration = 200
         animationRotate45Degree.fillAfter = true
         fabAdd.startAnimation(animationRotate45Degree)
+    }
+
+    fun setCheckBoxVisible(itemView: View){
+        val checkboxLayout = itemView.findViewById<LinearLayout>(R.id.checkbox_layout)
+        val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
+        var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
+
+        checkbox.visibility = View.VISIBLE
+        params.weight = 1f
+        checkboxLayout.layoutParams = params
+
+        val stockLayout = itemView.findViewById<LinearLayout>(R.id.stock_layout)
+        params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
+        params.weight = 5f
+        stockLayout.layoutParams = params
+    }
+
+    fun setCheckBoxInvisible(itemView: View){
+        val checkboxLayout = itemView.findViewById<LinearLayout>(R.id.checkbox_layout)
+        val checkbox = itemView.findViewById<CheckBox>(R.id.stock_checkbox)
+        var params = LinearLayout.LayoutParams(checkboxLayout.layoutParams.width, checkboxLayout.layoutParams.height)
+
+        checkbox.visibility = View.INVISIBLE
+        checkbox.isChecked = false
+        params.weight = 0f
+        checkboxLayout.layoutParams = params
+
+        val stockLayout = itemView.findViewById<LinearLayout>(R.id.stock_layout)
+        params = LinearLayout.LayoutParams(stockLayout.layoutParams.width, stockLayout.layoutParams.height)
+        params.weight = 6f
+        stockLayout.layoutParams = params
     }
 
     fun dpToPx(context: Context, dp: Float): Float {

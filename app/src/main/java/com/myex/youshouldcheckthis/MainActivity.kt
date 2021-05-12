@@ -106,8 +106,7 @@ class MainActivity : AppCompatActivity() {
         val fabAdd = findViewById<FloatingActionButton>(R.id.fab_add)
         fabAdd.setOnClickListener {
             if(adapter.isRemoveMode){ // x Btn -> Cancel
-                adapter.isRemoveMode= false
-                adapter.setCheckBoxInvisible()
+                adapter.setRemoveModeOff()
             }else{ // + Btn -> Add
                 val builder = AlertDialog.Builder(this)
                 val dialogView = layoutInflater.inflate(R.layout.custom_dialog, null)
@@ -147,8 +146,7 @@ class MainActivity : AppCompatActivity() {
                     todo.add(i)
                 }
             }
-            adapter.setCheckBoxInvisible()
-            adapter.isRemoveMode = false
+            adapter.setRemoveModeOff()
             for(i in todo){
                 adapter.removeItem(i)
             }
@@ -224,8 +222,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         if(adapter.isRemoveMode){
-            adapter.isRemoveMode= false
-            adapter.setCheckBoxInvisible()
+            adapter.setRemoveModeOff()
             return
         }
         super.onBackPressed()
