@@ -89,13 +89,6 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
             this.interfaceMainActivityForAdapter.setPreferenceStockList(dataSet)
             true
         })
-
-        //마지막 인덱스 밑에 여백 추가
-        if(position==this.itemCount-1){
-            var params = holder.itemView.layoutParams as RecyclerView.LayoutParams
-            params.bottomMargin = 150
-            holder.itemView.layoutParams = params
-        }
     }
 
     override fun getItemCount(): Int {
