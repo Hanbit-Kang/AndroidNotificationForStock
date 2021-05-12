@@ -13,24 +13,6 @@
     android:id="@+id/listview_item"
     android:descendantFocusability="blocksDescendants"
     >
-    <LinearLayout
-        android:layout_height="match_parent"
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:layout_width="0dp"
-        android:layout_weight="0"
-        android:orientation="horizontal"
-        android:id="@+id/checkbox_layout"
-        >
-        <CheckBox
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:button="@null"
-            android:background="@drawable/selector_checkbox"
-            android:id="@+id/stock_checkbox"
-            android:layout_gravity="center"
-            android:visibility="invisible"
-            />
-    </LinearLayout>
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:orientation="vertical"
