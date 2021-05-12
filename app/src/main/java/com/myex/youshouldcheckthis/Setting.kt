@@ -5,6 +5,6 @@ class Setting {
     var decreaseAlarm: Boolean? = false
     var increaseRateLimit: Float? = 3f
     var decreaseRateLimit: Float? = 3f
-    var repeatHour: Int? = 0
-    var repeatMinute: Int? = 30
+    var repeatHour: Int? = 6
+    var repeatMinute: Int? = 0
 }

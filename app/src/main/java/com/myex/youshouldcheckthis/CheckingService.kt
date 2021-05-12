@@ -73,7 +73,7 @@ class CheckingService : Service() {
                             delay(1000)
                         }
                     }
-                    delay(6*60000)//TODO
+                    delay(6*60000) //반복 주기
                 }else{
                     killCheckingCaroutine()
                 }
@@ -117,7 +117,7 @@ class CheckingService : Service() {
                                 .get()
 
                         val timeNow = Date(System.currentTimeMillis())
-                        if(listViewItemList!![index].recentAlarmDateTime==null||isAvailableStock(timeNow, listViewItemList!![index].recentAlarmDateTime!!)){ //연산 함수 만들기
+                        if(listViewItemList!![index].recentAlarmDateTime==null||isAvailableStock(timeNow, listViewItemList!![index].recentAlarmDateTime!!)){
                             val priceFluctuationData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2) > div:nth-child(1) > span:nth-child(2) > span:nth-child(1)").last()
                             val rateData = doc.select("#knowledge-finance-wholepage__entity-summary > div > g-card-section > div > g-card-section > div:nth-child(2)> div:nth-child(1) > span:nth-child(2) > span:nth-child(2) > span:nth-child(1)").last()
 
@@ -188,7 +188,6 @@ class CheckingService : Service() {
         setting.repeatHour?.let { calendar.add(Calendar.HOUR, it) }
         setting.repeatMinute?.let { calendar.add(Calendar.MINUTE, it) }
         val combinedTime:Date = calendar.time
-
         return combinedTime.before(timeNow)
     }
 }

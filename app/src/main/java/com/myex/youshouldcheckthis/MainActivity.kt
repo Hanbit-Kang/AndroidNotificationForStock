@@ -19,6 +19,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import androidx.core.view.size
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -33,7 +35,7 @@ public interface InterfaceMainActivityForAdapter{
 class MainActivity : AppCompatActivity() {
     private var mToast:Toast? = null
     private var isPThreadRunning = true
-    private lateinit var adapter:ListViewAdapter
+    private lateinit var adapter: CustomAdapter
     private val multiplePermissionsCode = 100
     private val requiredPermissions = arrayOf(
             Manifest.permission.INTERNET,
@@ -56,13 +58,14 @@ class MainActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.abs_id).text = "관심 종목"
 
         //ListView
-        val listview: ListView = findViewById<View>(R.id.stock_list_view) as ListView
-        adapter = ListViewAdapter()
+        val recyclerView: androidx.recyclerview.widget.RecyclerView = findViewById<View>(R.id.stock_recycler_view) as androidx.recyclerview.widget.RecyclerView
+        var listViewItemList = ArrayList<ListViewItem>()
+        adapter = CustomAdapter(listViewItemList)
         adapter.interfaceMainActivityForAdapter = object: InterfaceMainActivityForAdapter{
             override fun refreshStockView(viewGroupParent: ViewGroup, listViewItemList: ArrayList<ListViewItem>, index: Int) {
                 runOnUiThread{
                     adapter.notifyDataSetChanged()
-                    this.setPreferenceStockList(adapter.listViewItemList)
+                    this.setPreferenceStockList(adapter.dataSet)
                 }
             }
             override fun makeToastText(text: String, lengthToast:Int){
@@ -87,12 +90,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
         adapter.rootView = findViewById<View>(android.R.id.content).rootView
-        listview.adapter = adapter
+        recyclerView.adapter = adapter
 
         //Load Stocks From Preference To Adapter
         val tmp = adapter.interfaceMainActivityForAdapter.getPreferenceStockList()
         if(tmp!=null) {
-            adapter.listViewItemList = tmp
+            adapter.dataSet = tmp
             adapter.refreshAllStockList(false)
         }
 
@@ -138,8 +141,8 @@ class MainActivity : AppCompatActivity() {
         findViewById<FloatingActionButton>(R.id.fab_remove).setOnClickListener {
             var todo = arrayListOf<Int>()
             var i:Int= 0
-            for(i in listview.count-1 downTo 0){
-                val curCheckBox = listview.getChildAt(i).findViewById<CheckBox>(R.id.stock_checkbox)
+            for(i in recyclerView.size-1 downTo 0){
+                val curCheckBox = recyclerView.getChildAt(i).findViewById<CheckBox>(R.id.stock_checkbox)
                 if(curCheckBox.isChecked){
                     todo.add(i)
                 }
@@ -149,7 +152,7 @@ class MainActivity : AppCompatActivity() {
             for(i in todo){
                 adapter.removeItem(i)
             }
-            adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.listViewItemList)
+            adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.dataSet)
             runOnUiThread{
                 adapter.notifyDataSetChanged()
             }
@@ -165,7 +168,7 @@ class MainActivity : AppCompatActivity() {
                             //Checking Service에서 리스트를 갱신할 수도 있음
                             val tmp = adapter.interfaceMainActivityForAdapter.getPreferenceStockList()
                             if(tmp!=null) {
-                                adapter.listViewItemList = tmp
+                                adapter.dataSet = tmp
                             }
                             adapter.refreshAllStockList(true)
                             Log.i("MainActivity","PeriodicRefreshThread")
@@ -244,7 +247,7 @@ class MainActivity : AppCompatActivity() {
 
     fun setMessageNoList(){
         val messageNoListLayout = findViewById<LinearLayout>(R.id.message_no_list_layout)
-        if(adapter.count == 0){
+        if(adapter.itemCount == 0){
             messageNoListLayout.visibility = View.VISIBLE
         }else{
             messageNoListLayout.visibility = View.INVISIBLE
