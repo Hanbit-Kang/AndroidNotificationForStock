@@ -218,16 +218,51 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    fun swapItems(fromPosition: Int, toPosition: Int){
+        if(fromPosition < toPosition){
+            for(i in fromPosition until toPosition){
+                adapter.dataSet[i+1] = adapter.dataSet[i]
+                adapter.dataSet[i] = adapter.dataSet[i+1]
+            }
+        }else{
+            for(i in fromPosition..toPosition + 1){
+                adapter.dataSet[i-1] = adapter.dataSet[i]
+                adapter.dataSet[i] = adapter.dataSet[i-1]
+            }
+        }
+
+        adapter.notifyItemMoved(fromPosition, toPosition)
+    }
+
     val mIth: ItemTouchHelper.SimpleCallback =
         object : ItemTouchHelper.SimpleCallback(
             ItemTouchHelper.UP or ItemTouchHelper.DOWN,
-            ItemTouchHelper.LEFT
+            ItemTouchHelper.START or ItemTouchHelper.END
         ) {
+            override fun getMovementFlags(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder
+            ): Int {
+                val dragFlags = ItemTouchHelper.UP or ItemTouchHelper.DOWN
+                val swipeFlags = ItemTouchHelper.START or ItemTouchHelper.END
+                return makeMovementFlags(dragFlags, swipeFlags)
+            }
+
+            override fun isLongPressDragEnabled(): Boolean {
+                return true
+            }
+
+            override fun isItemViewSwipeEnabled(): Boolean {
+                return true
+            }
+
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
+
+                swapItems(viewHolder.adapterPosition, target.adapterPosition)
                 return true
             }
 
