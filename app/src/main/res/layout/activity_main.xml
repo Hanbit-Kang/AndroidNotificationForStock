@@ -54,4 +54,44 @@
         app:backgroundTint="#ecf0f1"
         />
 
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_drag"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="144dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_baseline_swap_vert_24"
+        app:backgroundTint="#ecf0f1"
+        tools:ignore="VectorDrawableCompat" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_swipe"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="80dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        app:srcCompat="@drawable/ic_baseline_delete_sweep_24"
+        app:backgroundTint="#ecf0f1"
+        tools:ignore="VectorDrawableCompat" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:layout_alignParentBottom="true"
+        android:visibility="invisible"
+        app:srcCompat="@android:drawable/ic_menu_close_clear_cancel"
+        app:backgroundTint="#ecf0f1"
+        tools:ignore="VectorDrawableCompat" />
+
 </RelativeLayout>

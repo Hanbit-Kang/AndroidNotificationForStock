@@ -6,4 +6,9 @@
         android:icon="@android:drawable/ic_menu_zoom"
         android:title="설정"
         />
+    <item
+        android:id="@+id/editItem"
+        android:icon="@android:drawable/ic_menu_zoom"
+        android:title="편집모드"
+        />
 </menu>

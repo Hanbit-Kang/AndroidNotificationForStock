@@ -19,6 +19,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import androidx.core.view.size
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
@@ -45,6 +46,10 @@ class MainActivity : AppCompatActivity() {
             Manifest.permission.RECEIVE_BOOT_COMPLETED
     )
 
+    private lateinit var fabDrag: View
+    private lateinit var fabSwipe: View
+    private lateinit var fabCancel: View
+
     private lateinit var listViewItemList:ArrayList<ListViewItem>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -60,6 +65,11 @@ class MainActivity : AppCompatActivity() {
         supportActionBar?.displayOptions = ActionBar.DISPLAY_SHOW_CUSTOM
         supportActionBar?.setCustomView(R.layout.abs_layout)
         findViewById<TextView>(R.id.abs_id).text = "관심 종목"
+
+        //get fab buttons
+        fabDrag = findViewById<FloatingActionButton>(R.id.fab_drag)
+        fabSwipe = findViewById<FloatingActionButton>(R.id.fab_swipe)
+        fabCancel = findViewById<FloatingActionButton>(R.id.fab_cancel)
 
         //ListView
         val recyclerView: androidx.recyclerview.widget.RecyclerView = findViewById<View>(R.id.stock_recycler_view) as androidx.recyclerview.widget.RecyclerView
@@ -129,6 +139,19 @@ class MainActivity : AppCompatActivity() {
             }, 200L)
         }
 
+        // Edit 3 Buttons
+        fabDrag.setOnClickListener{
+            adapter.setDragMode()
+            adapter.setEditButtonsColor(fabDrag, fabSwipe)
+        }
+        fabSwipe.setOnClickListener{
+            adapter.setSwipeMode()
+            adapter.setEditButtonsColor(fabDrag, fabSwipe)
+        }
+        fabCancel.setOnClickListener{
+            adapter.setEditMode(false, fabDrag, fabSwipe, fabCancel)
+        }
+
         //Swipe To Remove
         val itemTouchHelper = ItemTouchHelper(this.mIth)
         itemTouchHelper.attachToRecyclerView(recyclerView)
@@ -178,11 +201,24 @@ class MainActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId==R.id.settingItem) {
-            val settingActivity = SettingActivity()
-            val intent = Intent(this, settingActivity::class.java)
-            startActivity(intent)
-            overridePendingTransition(R.anim.to_left, R.anim.none)
+        when(item.itemId){
+            R.id.settingItem -> {
+                val settingActivity = SettingActivity()
+                val intent = Intent(this, settingActivity::class.java)
+                startActivity(intent)
+                overridePendingTransition(R.anim.to_left, R.anim.none)
+            }
+            R.id.editItem -> {
+                if(findViewById<FloatingActionButton>(R.id.fab_drag).isVisible){
+                    //편집모드 OFF
+                    adapter.setEditMode(false, fabDrag, fabSwipe, fabCancel)
+                }else{
+                    //편집모드 ON
+                    adapter.setEditMode(true, fabDrag, fabSwipe, fabCancel)
+                    adapter.setDragMode()
+                    adapter.setEditButtonsColor(fabDrag, fabSwipe)
+                }
+            }
         }
         return super.onOptionsItemSelected(item)
     }

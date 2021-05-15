@@ -1,7 +1,9 @@
 package com.myex.youshouldcheckthis
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Color
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.SystemClock
@@ -157,5 +159,46 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
             }
         )
         rThread.start()
+    }
+
+    //Drag 및 Swipe Mode
+    public fun setEditMode(flag: Boolean, dragView: View, swipeView: View, cancelView: View){
+        if(flag){
+            dragView.visibility = View.VISIBLE
+            swipeView.visibility = View.VISIBLE
+            cancelView.visibility = View.VISIBLE
+        }else{
+            dragView.visibility = View.INVISIBLE
+            swipeView.visibility = View.INVISIBLE
+            cancelView.visibility = View.INVISIBLE
+        }
+    }
+
+    public fun setDragMode(){
+        isDragMode = true
+        isSwipeMode = false
+
+        this.interfaceMainActivityForAdapter.makeToastText("종목을 상하로 이동시킬 수 있습니다.", Toast.LENGTH_SHORT)
+    }
+
+    public fun setSwipeMode(){
+        isSwipeMode = true
+        isDragMode = false
+
+        this.interfaceMainActivityForAdapter.makeToastText("종목을 좌우로 스와이프하여 삭제합니다.", Toast.LENGTH_SHORT)
+    }
+
+    public fun setEditButtonsColor(dragView: View, swipeView: View){
+        if(isDragMode) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                dragView.backgroundTintList  = ColorStateList.valueOf(Color.parseColor("#3498db"))
+                swipeView.backgroundTintList  = ColorStateList.valueOf(Color.parseColor("#ecf0f1"))
+            }
+        }else if(isSwipeMode){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                swipeView.backgroundTintList  = ColorStateList.valueOf(Color.parseColor("#3498db"))
+                dragView.backgroundTintList  = ColorStateList.valueOf(Color.parseColor("#ecf0f1"))
+            }
+        }
     }
 }
