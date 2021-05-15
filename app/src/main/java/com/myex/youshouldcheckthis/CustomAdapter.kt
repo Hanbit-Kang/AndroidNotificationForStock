@@ -8,6 +8,7 @@ import android.os.SystemClock
 import android.util.Log
 import android.util.TypedValue
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.Animation
@@ -23,6 +24,8 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
     private lateinit var viewGroupParent: ViewGroup
     public lateinit var rootView: View
     public lateinit var interfaceMainActivityForAdapter:InterfaceMainActivityForAdapter
+    public var isSwipeMode = false
+    public var isDragMode = false
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
         val textStockNameView: TextView

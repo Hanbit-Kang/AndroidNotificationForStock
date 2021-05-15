@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.gesture.Gesture
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -105,7 +106,7 @@ class MainActivity : AppCompatActivity() {
         //종목 없을 때 보이는 메시지 세팅
         setMessageNoList()
 
-        // + / x Btn
+        // + Btn
         val fabAdd = findViewById<FloatingActionButton>(R.id.fab_add)
         fabAdd.setOnClickListener {
             val builder = AlertDialog.Builder(this)
@@ -249,11 +250,11 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun isLongPressDragEnabled(): Boolean {
-                return true
+                return adapter.isDragMode
             }
 
             override fun isItemViewSwipeEnabled(): Boolean {
-                return true
+                return adapter.isSwipeMode
             }
 
             override fun onMove(
@@ -261,9 +262,8 @@ class MainActivity : AppCompatActivity() {
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
             ): Boolean {
-
                 swapItems(viewHolder.adapterPosition, target.adapterPosition)
-                return true
+                return false
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
