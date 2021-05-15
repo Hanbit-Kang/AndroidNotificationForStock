@@ -40,10 +40,10 @@ class MainActivity : AppCompatActivity() {
     private lateinit var adapter: CustomAdapter
     private val multiplePermissionsCode = 100
     private val requiredPermissions = arrayOf(
-            Manifest.permission.INTERNET,
-            Manifest.permission.USE_FULL_SCREEN_INTENT,
-            Manifest.permission.FOREGROUND_SERVICE,
-            Manifest.permission.RECEIVE_BOOT_COMPLETED
+        Manifest.permission.INTERNET,
+        Manifest.permission.USE_FULL_SCREEN_INTENT,
+        Manifest.permission.FOREGROUND_SERVICE,
+        Manifest.permission.RECEIVE_BOOT_COMPLETED
     )
 
     private lateinit var fabDrag: View
@@ -159,22 +159,22 @@ class MainActivity : AppCompatActivity() {
         //Periodic Refresh
         isPThreadRunning = true
         val pThread = Thread( //Error app이 실행된 상태에서 alarm으로 MainActivity 진입 시 Thread 중복
-                Runnable{
-                    try{
-                        while(isPThreadRunning){
-                            //Checking Service에서 리스트를 갱신할 수도 있음
-                            val tmp = adapter.interfaceMainActivityForAdapter.getPreferenceStockList()
-                            if(tmp!=null) {
-                                adapter.dataSet = tmp
-                            }
-                            adapter.refreshAllStockList(true)
-                            Log.i("MainActivity","PeriodicRefreshThread")
-                            Thread.sleep(60000)
+            Runnable{
+                try{
+                    while(isPThreadRunning){
+                        //Checking Service에서 리스트를 갱신할 수도 있음
+                        val tmp = adapter.interfaceMainActivityForAdapter.getPreferenceStockList()
+                        if(tmp!=null) {
+                            adapter.dataSet = tmp
                         }
-                    }catch(e:Exception){
-                        e.printStackTrace()
+                        adapter.refreshAllStockList(true)
+                        Log.i("MainActivity","PeriodicRefreshThread")
+                        Thread.sleep(60000)
                     }
+                }catch(e:Exception){
+                    e.printStackTrace()
                 }
+            }
         )
         pThread?.start()
     }
@@ -193,7 +193,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-    
+
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
         inflater.inflate(R.menu.menu_setting, menu)
@@ -256,17 +256,11 @@ class MainActivity : AppCompatActivity() {
     }
 
     fun swapItems(fromPosition: Int, toPosition: Int){
-        if(fromPosition < toPosition){
-            for(i in fromPosition until toPosition){
-                adapter.dataSet[i+1] = adapter.dataSet[i]
-                adapter.dataSet[i] = adapter.dataSet[i+1]
-            }
-        }else{
-            for(i in fromPosition..toPosition + 1){
-                adapter.dataSet[i-1] = adapter.dataSet[i]
-                adapter.dataSet[i] = adapter.dataSet[i-1]
-            }
-        }
+        var items = adapter.dataSet
+        val fromItem = items[fromPosition]
+
+        items.removeAt(fromPosition)
+        items.add(toPosition, fromItem)
 
         adapter.notifyItemMoved(fromPosition, toPosition)
     }
@@ -299,7 +293,7 @@ class MainActivity : AppCompatActivity() {
                 target: RecyclerView.ViewHolder
             ): Boolean {
                 swapItems(viewHolder.adapterPosition, target.adapterPosition)
-                return false
+                return true
             }
 
             override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
@@ -310,6 +304,7 @@ class MainActivity : AppCompatActivity() {
                 runOnUiThread{
                     adapter.notifyDataSetChanged()
                 }
+
                 setMessageNoList()
             }
         }
