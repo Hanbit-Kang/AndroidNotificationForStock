@@ -242,6 +242,19 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 
+    override fun onBackPressed() {
+        if(adapter.isDragMode || adapter.isSwipeMode){
+            adapter.setEditMode(false, fabDrag, fabSwipe, fabCancel)
+
+            adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.dataSet)
+            runOnUiThread{
+                adapter.notifyDataSetChanged()
+            }
+        }else{
+            super.onBackPressed()
+        }
+    }
+
     fun checkPermissionAndRequest(){
         var rejectedPermissionList = ArrayList<String>()
         for(permission in requiredPermissions){
