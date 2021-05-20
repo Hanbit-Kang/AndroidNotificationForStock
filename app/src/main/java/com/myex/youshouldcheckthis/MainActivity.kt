@@ -150,6 +150,11 @@ class MainActivity : AppCompatActivity() {
         }
         fabCancel.setOnClickListener{
             adapter.setEditMode(false, fabDrag, fabSwipe, fabCancel)
+
+            adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.dataSet)
+            runOnUiThread{
+                adapter.notifyDataSetChanged()
+            }
         }
 
         //Swipe To Remove
@@ -212,6 +217,11 @@ class MainActivity : AppCompatActivity() {
                 if(findViewById<FloatingActionButton>(R.id.fab_drag).isVisible){
                     //편집모드 OFF
                     adapter.setEditMode(false, fabDrag, fabSwipe, fabCancel)
+
+                    adapter.interfaceMainActivityForAdapter.setPreferenceStockList(adapter.dataSet)
+                    runOnUiThread{
+                        adapter.notifyDataSetChanged()
+                    }
                 }else{
                     //편집모드 ON
                     adapter.setEditMode(true, fabDrag, fabSwipe, fabCancel)

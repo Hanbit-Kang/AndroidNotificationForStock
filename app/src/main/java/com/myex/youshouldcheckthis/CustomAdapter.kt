@@ -178,7 +178,7 @@ class CustomAdapter(public var dataSet: ArrayList<ListViewItem>) : RecyclerView.
         isDragMode = true
         isSwipeMode = false
 
-        this.interfaceMainActivityForAdapter.makeToastText("종목을 상하로 이동시킬 수 있습니다.", Toast.LENGTH_SHORT)
+        this.interfaceMainActivityForAdapter.makeToastText("종목을 길게 터치하여 위치를 변경할 수 있습니다.", Toast.LENGTH_SHORT)
     }
 
     public fun setSwipeMode(){
