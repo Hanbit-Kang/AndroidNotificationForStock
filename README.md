@@ -1,5 +1,5 @@
 # 이건 아셔야겠는데요
-관심 종목들을 추가하고, 주가가 지정한 퍼센테이지/가격을 초과하면 Notification을 발생시키는 안드로이드 어플입니다.
+관심 종목들을 추가하고, 주가가 지정한 퍼센테이지/가격을 초과하면 Notification을 발생시키는 안드로이드 어플입니다. Android Native Kotlin을 공부하기 위해 진행한 토이프로젝트입니다.
 
 ![grapic](https://user-images.githubusercontent.com/58168528/131151379-0bd6530a-6a5d-45d5-9163-258ed8951727.png)
 
